@@ -14,8 +14,8 @@ class Router implements Contract\IRouter
     public function route($uri)
     {
         foreach ($this->rules as $rule) {
-            if ($r = $rule->match($uri)) {
-                return $r;
+            if (false !== ($r = $rule->match($uri))) {
+                return new Route($r->entry, $r->args);
             };
         };
 

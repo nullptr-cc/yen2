@@ -21,9 +21,9 @@ class Rule
         $this->vmap = $lrx['vmap'];
     }
 
-    public function match($location)
+    public function match($uri)
     {
-        if (!preg_match($this->location_rx, $location, $matches)) {
+        if (!preg_match($this->location_rx, $uri, $matches)) {
             return false;
         };
 
@@ -33,7 +33,7 @@ class Rule
                 $vars[$vname] = $matches[$index + 1];
             };
         };
-        $vars['uri'] = $location;
+        $vars['uri'] = $uri;
 
         $result = preg_replace_callback('~\$([a-z0-9_]+)~', function($m) use (&$vars) {
             $value = $vars[$m[1]];
@@ -41,7 +41,12 @@ class Rule
             return $value;
         }, $this->result);
 
-        return new Route(trim(preg_replace('~/{2,}~', '/', $result), '/'), $vars);
+        unset($vars['uri']);
+
+        return (object)[
+            'entry' => trim(preg_replace('~/{2,}~', '/', $result), '/'),
+            'args' => $vars
+        ];
     }
 
     public function apply($args)
@@ -53,13 +58,9 @@ class Rule
             if ($str[0] != ':') {
                 return $str;
             };
-            $nv = array_map('trim', explode('=', $str));
+            $nv = array_map('trim', explode('=', substr($str, 1)));
             $used_args[$nv[0]] = true;
-            if (count($nv) == 1) {
-                return $args[$nv[0]];
-            } else {
-                return isset($args[$nv[0]]) ? $args[$nv[0]] : $nv[1];
-            };
+            return isset($args[$nv[0]]) ? $args[$nv[0]] : ((count($nv) == 1) ? '' : $nv[1]);
         }, $this->location);
 
         $uri = preg_replace_callback('~:[a-z0-9_]+~', function($m) use ($args, &$used_args) {
@@ -68,7 +69,7 @@ class Rule
             return $args[$str];
         }, $uri);
 
-        return [
+        return (object)[
             'uri' => $uri,
             'args' => array_diff_key($args, $used_args)
         ];
