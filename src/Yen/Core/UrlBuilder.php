@@ -24,8 +24,8 @@ class UrlBuilder
     {
         if (strpos($uri, 'route:') === 0) {
             $resolved = $this->dc->router()->resolve(substr($uri, 6), $args);
-            $uri = $resolved['uri'];
-            $args = $resolved['args'];
+            $uri = $resolved->uri;
+            $args = $resolved->args;
         };
 
         $qs = count($args) ? http_build_query($args) : '';
