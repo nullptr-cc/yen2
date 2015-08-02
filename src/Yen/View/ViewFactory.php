@@ -25,7 +25,7 @@ class ViewFactory
         };
     }
 
-    public function makeNullView()
+    protected function makeNullView()
     {
         return new NullView($this->dc);
     }
