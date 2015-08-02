@@ -55,6 +55,10 @@ class StreamWrapper
 
     public static function unregister($scheme)
     {
+        if (!in_array($scheme, stream_get_wrappers())) {
+            return;
+        };
+
         if (!stream_wrapper_unregister($scheme)) {
             throw new \RuntimeException('Cannot unregister stream wrapper');
         };
