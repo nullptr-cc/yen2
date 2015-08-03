@@ -31,12 +31,12 @@ class Bootstrap
 
     public function bootstrap()
     {
-        return new DC([
+        return [
             'router' => [$this, 'initRouter'],
             'handler_factory' => [$this, 'initHandlerFactory'],
             'view_factory' => [$this, 'initViewFactory'],
             'renderer_factory' => [$this, 'initRendererFactory'],
             'url_builder' => [$this, 'initUrlBuilder'],
-        ]);
+        ];
     }
 }
