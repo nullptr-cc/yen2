@@ -24,6 +24,7 @@ class ServerRequest implements Contract\IServerRequest
         $this->cookies = $cookies;
         $this->files = static::populateFiles($files);
 
+        $this->headers = [];
         foreach ($env as $key => $value) {
             if (strpos($key, 'HTTP_') === 0) {
                 $nkey = strtolower(str_replace('_', '-', substr($key, 5)));
