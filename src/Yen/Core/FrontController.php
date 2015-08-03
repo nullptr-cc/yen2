@@ -23,9 +23,4 @@ class FrontController
 
         return $view->handle($request->getMethod(), $response);
     }
-
-    public static function createDefault()
-    {
-        return new self((new Bootstrap())->bootstrap());
-    }
 }
