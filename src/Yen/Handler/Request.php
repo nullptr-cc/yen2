@@ -9,7 +9,7 @@ class Request implements Contract\IRequest
     protected $arguments;
     protected $x_arguments;
 
-    public function __construct(Http\Contract\IServerRequest $request, $arguments = null)
+    public function __construct(Http\Contract\IServerRequest $request, $arguments = [])
     {
         $this->arguments = array_merge(
             $request->getQueryParams(),
