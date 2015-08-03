@@ -8,7 +8,6 @@ trait MockServerRequest
     {
         $srequest = $this->getMockBuilder('\Yen\Http\ServerRequest')
                          ->disableOriginalConstructor()
-                         ->setMethods(['getQueryParams', 'getParsedBody', 'getHeaders'])
                          ->getMock();
 
         $srequest->method('getQueryParams')->willReturn($get);
