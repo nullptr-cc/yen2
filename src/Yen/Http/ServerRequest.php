@@ -22,7 +22,7 @@ class ServerRequest implements Contract\IServerRequest
         $this->query = $query;
         $this->body = $body;
         $this->cookies = $cookies;
-        $this->files = static::populateFiles($files);
+        $this->files = $files;
 
         $this->headers = [];
         foreach ($env as $key => $value) {
@@ -32,12 +32,17 @@ class ServerRequest implements Contract\IServerRequest
             };
         };
 
-        if (strpos('?', $this->target) !== false) {
-            list($path, $query) = explode('?', $this->target);
-            $this->uri = new Uri(['path' => $path, 'query' => $query]);
+        $uri_args = [
+            'scheme' => isset($env['REQUEST_SCHEME']) ? $env['REQUEST_SCHEME'] : null,
+            'host' => isset($env['HTTP_HOST']) ? $env['HTTP_HOST'] : null,
+        ];
+        if (strpos($this->target, '?') !== false) {
+            list($p, $q) = explode('?', $this->target, 2);
+            $uri_args += ['path' => $p, 'query' => $q];
         } else {
-            $this->uri = new Uri(['path' => $this->target]);
+            $uri_args += ['path' => $this->target];
         };
+        $this->uri = self::makeUri($uri_args);
     }
 
     public function getMethod()
@@ -92,18 +97,27 @@ class ServerRequest implements Contract\IServerRequest
 
     public function getHeader($name)
     {
-        return $this->hasHeader($name) ? $this->headers[$name] : [];
+        return $this->hasHeader($name) ? $this->headers[$name] : null;
     }
 
     public function getHeaderLine($name)
     {
-        return $this->hasHeader($name) ? implode(',', $this->headers[$name]) : '';
+        if (!$this->hasHeader($name)) {
+            return '';
+        };
+
+        return is_array($this->headers[$name]) ? implode(',', $this->headers[$name]) : $this->headers[$name];
     }
 
-    protected static function populateFiles(array $files)
+    protected static function makeUri(array $args)
+    {
+        return new Uri($args);
+    }
+
+    public static function fillFiles(array $files)
     {
         $create = function($inf) {
-            return new UploadedFile($inf['error'], $inf['name'], $inf['size'], $inf['type'], $inf['tmp_name']);
+            return new UploadedFile($inf['error'], $inf['size'], $inf['name'], $inf['type'], $inf['tmp_name']);
         };
 
         $return = [];
@@ -120,7 +134,7 @@ class ServerRequest implements Contract\IServerRequest
                 };
             };
             foreach ($_ as $finfo) {
-                $retutn[$pname][] = $create($finfo);
+                $return[$pname][] = $create($finfo);
             };
         };
 
