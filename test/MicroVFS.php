@@ -6,17 +6,45 @@ class Container
 {
     protected $fs = [];
 
-    public function set($path, $content)
+    public function set($path, $content, $writable = true)
     {
         $this->fs[$path] = (object)[
             'content' => $content,
-            'size' => strlen($content)
+            'size' => strlen($content),
+            'is_dir' => false,
+            'mode' => $writable ? 0100666: 0100444
+        ];
+    }
+
+    public function setDir($path, $writable = true)
+    {
+        $this->fs[$path] = (object)[
+            'size' => 512,
+            'is_dir' => true,
+            'mode' => $writable ? 040777 : 040555
         ];
     }
 
     public function has($path)
     {
         return array_key_exists($path, $this->fs);
+    }
+
+    public function get($path)
+    {
+        return $this->has($path) ? $this->fs[$path] : null;
+    }
+
+    public function rename($src, $dst)
+    {
+        if (!$this->has($src)) {
+            return false;
+        };
+
+        $this->fs[$dst] = $this->fs[$src];
+        unset($this->fs[$src]);
+
+        return true;
     }
 
     public function sizeOf($path)
@@ -62,7 +90,7 @@ class StreamWrapper
         if (!stream_wrapper_unregister($scheme)) {
             throw new \RuntimeException('Cannot unregister stream wrapper');
         };
-        
+
         unset(self::$containers[$scheme]);
     }
 
@@ -113,15 +141,29 @@ class StreamWrapper
     public function url_stat($path, $flags)
     {
         list($scheme, $uri) = explode('://', $path, 2);
-        if (!self::$containers[$scheme]->has($uri)) {
+        $container = self::$containers[$scheme];
+        if (!$container->has($uri)) {
             return null;
         };
 
+        $obj = $container->get($uri);
+
         return [
-            'mode' => 0666,
-            'size' => self::$containers[$scheme]->sizeOf($uri),
-            'atime' => time(),
+            'mode' => $obj->mode,
+            'size' => $obj->size,
             'mtime' => time()
         ];
+    }
+
+    public function rename($src, $dst)
+    {
+        list($scheme_src, $uri_src) = explode('://', $src, 2);
+        list($scheme_dst, $uri_dst) = explode('://', $dst, 2);
+
+        if ($scheme_src != $scheme_dst) {
+            throw new \InvalidArgumentException('Cannot rename between different schemes');
+        };
+
+        return self::$containers[$scheme_src]->rename($uri_src, $uri_dst);
     }
 }
