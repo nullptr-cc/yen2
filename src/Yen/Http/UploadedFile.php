@@ -47,7 +47,7 @@ class UploadedFile
             throw new \RuntimeException('file not uploaded');
         };
 
-        if ($this->moved) {
+        if ($this->isMoved()) {
             throw new \RuntimeException('file already moved');
         };
 
@@ -61,18 +61,22 @@ class UploadedFile
             throw new \InvalidArgumentException('target dir is not writable');
         };
 
-        if (PHP_SAPI == 'cli') {
-            if (!rename($this->path, $target_path)) {
-                throw new \RuntimeException('file not moved');
-            };
-        } else {
-            if (!move_uploaded_file($this->path, $target_path)) {
-                throw new \RuntimeException('file not moved');
-            };
+        if (!$this->move($this->path, $target_path)) {
+            throw new \RuntimeException('file not moved');
         };
 
         $this->moved = true;
 
         return true;
+    }
+
+    public function isMoved()
+    {
+        return $this->moved;
+    }
+
+    protected function move($src, $dst)
+    {
+        return move_uploaded_file($this->path, $target_path);
     }
 }
