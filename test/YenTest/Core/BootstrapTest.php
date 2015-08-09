@@ -7,6 +7,7 @@ use Yen\Core\Bootstrap;
 class BootstrapTest extends \PHPUnit_Framework_TestCase
 {
     use \YenTest\Mixin\MockDC;
+    use \YenTest\Mixin\MockRouter;
 
     public function testInitRouter()
     {
@@ -38,14 +39,14 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
 
     public function testInitUrlBuilder()
     {
-        $dc = $this->mockDC();
+        $dc = $this->mockDC(['router' => $this->mockRouter()]);
         $bs = new Bootstrap();
         $this->assertInstanceOf('\Yen\Core\UrlBuilder', $bs->initUrlBuilder($dc));
     }
 
     public function testBootstrap()
     {
-        $dc = $this->mockDC();
+        $dc = $this->mockDC(['router' => $this->mockRouter()]);
         $bs = new Bootstrap();
         $cfg = $bs->bootstrap();
 

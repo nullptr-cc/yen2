@@ -3,37 +3,39 @@
 namespace Yen\Core;
 
 use Yen\Http;
+use Yen\Router;
 
 class UrlBuilder
 {
-    protected $dc;
+    protected $router;
     protected $base_url;
 
-    public function __construct(Contract\IDependencyContainer $dc, Http\Contract\IUri $base_url = null)
+    public function __construct(Router\Contract\IRouter $router, Http\Contract\IUri $base_url = null)
     {
-        $this->dc = $dc;
+        $this->router = $router;
         $this->base_url = $base_url;
     }
 
-    public function __invoke($uri, array $args = [])
+    public function __invoke(Http\Contract\IUri $uri, array $args = [])
     {
         return $this->build($uri, $args);
     }
 
-    public function build($uri, array $args = [])
+    public function build(Http\Contract\IUri $uri, array $args = [])
     {
-        if (strpos($uri, 'route:') === 0) {
-            $resolved = $this->dc->router()->resolve(substr($uri, 6), $args);
-            $uri = $resolved->uri;
+        if ($uri->getScheme() == 'route') {
+            $resolved = $this->router->resolve($uri->getPath(), $args);
+            if (null === $resolved) {
+                throw new \InvalidArgumentException('Unknown route "' . $uri->getPath() . '"');
+            };
+            $uri = Http\Uri::createFromString($resolved->uri);
             $args = $resolved->args;
         };
 
-        $qs = count($args) ? http_build_query($args) : '';
-
-        if (strpos($uri, '://') !== false) {
-            return Http\Uri::createFromString($uri)->withQuery($qs);
-        } else {
-            return $this->base_url->withPath($uri)->withQuery($qs);
+        if (!$uri->getScheme()) {
+            $uri = $this->base_url->withPath($uri->getPath());
         };
+
+        return $uri->withQuery(http_build_query($args));
     }
 }

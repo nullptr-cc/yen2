@@ -26,7 +26,7 @@ class Bootstrap
 
     public function initUrlBuilder(Contract\IDependencyContainer $dc)
     {
-        return new \Yen\Core\UrlBuilder($dc);
+        return new \Yen\Core\UrlBuilder($dc->router());
     }
 
     public function bootstrap()
