@@ -2,17 +2,20 @@
 
 namespace Yen\Renderer;
 
-class RendererFactory
+class RendererFactory implements Contract\IRendererFactory
 {
-    public function make($content_type = null)
+    public function makeDefaultRenderer()
     {
-        switch ($content_type) {
-            case 'json':
-                return new JsonRenderer();
-                break;
-            default:
-                return new DefaultRenderer();
-                break;
-        };
+        return new DefaultRenderer();
+    }
+
+    public function makeJsonRenderer()
+    {
+        return new JsonRenderer();
+    }
+
+    public function makeHtmlRenderer()
+    {
+        return new DefaultRenderer();
     }
 }
