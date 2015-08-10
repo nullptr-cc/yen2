@@ -6,7 +6,7 @@ use Yen\Handler;
 
 class HandlerTest extends \PHPUnit_Framework_TestCase
 {
-    use MockServerRequest;
+    use \YenMock\MockServerRequest;
 
     public function testHandle()
     {

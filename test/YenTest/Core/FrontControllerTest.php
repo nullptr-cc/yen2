@@ -6,13 +6,13 @@ use Yen\Core;
 
 class FrontControllerTest extends \PHPUnit_Framework_TestCase
 {
-    use \YenTest\Mixin\MockDC;
-    use \YenTest\Mixin\MockRoute;
-    use \YenTest\Mixin\MockRouter;
-    use \YenTest\Handler\MockServerRequest;
-    use \YenTest\Mixin\MockHandlerFactory;
-    use \YenTest\Mixin\MockViewFactory;
-    use \YenTest\Mixin\MockHttpResponse;
+    use \YenMock\MockDC;
+    use \YenMock\MockRoute;
+    use \YenMock\MockRouter;
+    use \YenMock\MockServerRequest;
+    use \YenMock\MockHandlerFactory;
+    use \YenMock\MockViewFactory;
+    use \YenMock\MockHttpResponse;
 
     public function testProcessRequest()
     {

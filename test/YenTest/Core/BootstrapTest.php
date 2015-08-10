@@ -6,8 +6,8 @@ use Yen\Core\Bootstrap;
 
 class BootstrapTest extends \PHPUnit_Framework_TestCase
 {
-    use \YenTest\Mixin\MockDC;
-    use \YenTest\Mixin\MockRouter;
+    use \YenMock\MockDC;
+    use \YenMock\MockRouter;
 
     public function testInitRouter()
     {

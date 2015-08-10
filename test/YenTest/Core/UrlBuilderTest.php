@@ -6,7 +6,7 @@ use Yen\Core\UrlBuilder;
 
 class UrlBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    use \YenTest\Mixin\MockRouter;
+    use \YenMock\MockRouter;
 
     public function testBuildSimple()
     {

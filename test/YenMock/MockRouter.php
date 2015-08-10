@@ -1,6 +1,6 @@
 <?php
 
-namespace YenTest\Mixin;
+namespace YenMock;
 
 trait MockRouter
 {
