@@ -19,7 +19,7 @@ class FrontController
         $route = $this->dc->router()->route($request->getUri()->getPath());
         $handler = $this->dc->handler_factory()->makeHandler($route->entry());
         $response = $handler->handle($request->getMethod(), new Handler\Request($request, $route->arguments()));
-        $view = $this->dc->view_factory()->make($route->entry());
+        $view = $this->dc->view_factory()->makeView($route->entry());
 
         return $view->handle($request->getMethod(), $response);
     }

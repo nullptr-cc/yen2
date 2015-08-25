@@ -17,15 +17,20 @@ abstract class View
 
     public function handle($method, Handler\Response $response)
     {
-        $mname = $this->defineMethodName($method, $response);
+        $mname = $this->resolveMethodName($method, $response);
 
-        list($headers, $body) = $this->{$mname}($response->data());
+        if (null === $mname) {
+            list($headers, $body) = $this->makeMissedViewMethodResponse($method, $response);
+        } else {
+            list($headers, $body) = $this->{$mname}($response->data());
+        };
+
         $code = $response->code();
 
         return new Http\Response($code, $headers, $body);
     }
 
-    protected function defineMethodName($method, $response)
+    protected function resolveMethodName($method, $response)
     {
         if ($response->isRedirect()) {
             return 'onRedirect';
@@ -44,6 +49,8 @@ abstract class View
                 return $name;
             };
         };
+
+        return null;
     }
 
     protected function onRedirect($data)
@@ -53,18 +60,10 @@ abstract class View
         return [$headers, null];
     }
 
-    protected function onOk($data)
+    protected function makeMissedViewMethodResponse($method, $response)
     {
         $headers = ['Content-Type' => 'text/plain'];
-        $body = 'You have missed view method';
-
-        return [$headers, $body];
-    }
-
-    protected function onError($data)
-    {
-        $headers = ['Content-Type' => 'text/plain'];
-        $body = is_array($data) ? print_r($data, true) : $data;
+        $body = sprintf('You have missed view method for: %s, %s', $method, $response::name());
 
         return [$headers, $body];
     }

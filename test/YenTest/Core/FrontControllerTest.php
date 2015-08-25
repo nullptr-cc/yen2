@@ -61,7 +61,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
                  ->with($this->equalTo('test'))
                  ->willReturn($handler);
 
-        $view = $this->getMockBuilder('\Yen\View\NullView')
+        $view = $this->getMockBuilder('\Yen\View\DefaultView')
                      ->disableOriginalConstructor()
                      ->getMock();
         $view->method('handle')
@@ -73,7 +73,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
             );
 
         $vfactory = $this->mockViewFactory();
-        $vfactory->method('make')
+        $vfactory->method('makeView')
                  ->with($this->equalTo('test'))
                  ->willReturn($view);
 

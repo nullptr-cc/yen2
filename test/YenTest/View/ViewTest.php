@@ -3,7 +3,7 @@
 namespace YenTest;
 
 use Yen\View\View;
-use Yen\View\NullView;
+use Yen\View\DefaultView;
 
 class CustomView extends View
 {
@@ -32,27 +32,32 @@ class NotFoundView extends View
     }
 }
 
+class MissedMethodView extends View
+{}
+
 class ViewTest extends \PHPUnit_Framework_TestCase
 {
+    use \YenMock\MockDC;
+
     public function testHandleOk()
     {
-        $dc = new \Yen\Core\DC();
+        $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\Ok();
 
-        $view = new NullView($dc);
+        $view = new DefaultView($dc);
         $vr = $view->handle('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(200, $vr->getStatusCode());
         $this->assertEquals(['Content-Type' => 'text/plain'], $vr->getHeaders());
-        $this->assertEquals('You have missed view method', $vr->getBody());
+        $this->assertEquals('', $vr->getBody());
     }
 
     public function testHandleError()
     {
-        $dc = new \Yen\Core\DC();
+        $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\ErrorNotFound('error message');
 
-        $view = new NullView($dc);
+        $view = new DefaultView($dc);
         $vr = $view->handle('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(404, $vr->getStatusCode());
@@ -62,10 +67,10 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleRedirect()
     {
-        $dc = new \Yen\Core\DC();
+        $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\Redirect('http://test.net');
 
-        $view = new NullView($dc);
+        $view = new DefaultView($dc);
         $vr = $view->handle('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(302, $vr->getStatusCode());
@@ -75,7 +80,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleGetOk()
     {
-        $dc = new \Yen\Core\DC();
+        $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\Ok();
 
         $view = new CustomView($dc);
@@ -88,7 +93,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleGetError()
     {
-        $dc = new \Yen\Core\DC();
+        $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\ErrorNotFound('message');
 
         $view = new CustomView($dc);
@@ -101,7 +106,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleGetExactError()
     {
-        $dc = new \Yen\Core\DC();
+        $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\ErrorNotFound('message');
 
         $view = new NotFoundView($dc);
@@ -110,5 +115,18 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(404, $vr->getStatusCode());
         $this->assertEquals(['Content-Type' => 'text/plain'], $vr->getHeaders());
         $this->assertEquals('get error not found: message', $vr->getBody());
+    }
+
+    public function testMissedMethod()
+    {
+        $dc = $this->mockDC();
+        $response = new \Yen\Handler\Response\Ok();
+
+        $view = new MissedMethodView($dc);
+        $vr = $view->handle('GET', $response);
+        $this->assertInstanceOf('\Yen\Http\Response', $vr);
+        $this->assertEquals(200, $vr->getStatusCode());
+        $this->assertEquals(['Content-Type' => 'text/plain'], $vr->getHeaders());
+        $this->assertEquals('You have missed view method for: GET, Ok', $vr->getBody());
     }
 }
