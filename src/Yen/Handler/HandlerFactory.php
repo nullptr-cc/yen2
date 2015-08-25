@@ -4,7 +4,7 @@ namespace Yen\Handler;
 
 use Yen\Core;
 
-class HandlerFactory
+class HandlerFactory implements Contract\IHandlerFactory
 {
     protected $dc;
     protected $format;
@@ -15,23 +15,28 @@ class HandlerFactory
         $this->format = $format;
     }
 
-    public function make($name)
+    public function makeHandler($handler_name)
     {
-        $classname = sprintf($this->format, static::e2c($name));
+        $classname = $this->resolveClassname($handler_name);
         if (class_exists($classname)) {
-            return new $classname($this->dc);
+            return $this->makeExistentHandler($classname);
         } else {
-            return $this->makeNullHandler($classname);
+            return $this->makeMissedHandler($classname);
         };
     }
 
-    protected function makeNullHandler($classname)
+    protected function makeExistentHandler($classname)
     {
-        return new NullHandler('Missed handler ' . $classname);
+        return new $classname($this->dc);
     }
 
-    protected static function e2c($name)
+    protected function makeMissedHandler($classname)
     {
-        return implode('\\', array_map('ucfirst', explode('/', $name)));
+        return new MissedHandler($classname);
+    }
+
+    protected function resolveClassname($handler_name)
+    {
+        return sprintf($this->format, implode('\\', array_map('ucfirst', explode('/', $handler_name))));
     }
 }

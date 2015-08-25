@@ -2,13 +2,13 @@
 
 namespace Yen\Handler;
 
-class NullHandler
+class MissedHandler
 {
     protected $message;
 
-    public function __construct($message)
+    public function __construct($classname)
     {
-        $this->message = $message;
+        $this->message = $classname;
     }
 
     public function handle($method, Request $request)

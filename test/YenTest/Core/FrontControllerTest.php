@@ -57,7 +57,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
                 );
 
         $hfactory = $this->mockHandlerFactory();
-        $hfactory->method('make')
+        $hfactory->method('makeHandler')
                  ->with($this->equalTo('test'))
                  ->willReturn($handler);
 
