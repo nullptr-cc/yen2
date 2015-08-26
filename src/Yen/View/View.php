@@ -6,7 +6,7 @@ use Yen\Core;
 use Yen\Http;
 use Yen\Handler;
 
-abstract class View
+abstract class View implements Contract\IView
 {
     protected $dc;
 
@@ -15,7 +15,7 @@ abstract class View
         $this->dc = $dc;
     }
 
-    public function handle($method, Handler\Contract\IResponse $response)
+    public function present($method, Handler\Contract\IResponse $response)
     {
         $mname = $this->resolveMethodName($method, $response);
 

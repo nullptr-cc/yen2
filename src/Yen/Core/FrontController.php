@@ -21,7 +21,7 @@ class FrontController
         $response = $handler->handle($request->getMethod(), $this->makeHandlerRequest($request, $route->arguments()));
         $view = $this->dc->get('view_factory')->makeView($route->entry());
 
-        return $view->handle($request->getMethod(), $response);
+        return $view->present($request->getMethod(), $response);
     }
 
     protected function makeHandlerRequest(Http\Contract\IServerRequest $request, array $arguments)

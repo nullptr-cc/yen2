@@ -45,7 +45,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $response = new \Yen\Handler\Response\Ok();
 
         $view = new DefaultView($dc);
-        $vr = $view->handle('GET', $response);
+        $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(200, $vr->getStatusCode());
         $this->assertEquals(['Content-Type' => 'text/plain'], $vr->getHeaders());
@@ -58,7 +58,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $response = new \Yen\Handler\Response\ErrorNotFound('error message');
 
         $view = new DefaultView($dc);
-        $vr = $view->handle('GET', $response);
+        $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(404, $vr->getStatusCode());
         $this->assertEquals(['Content-Type' => 'text/plain'], $vr->getHeaders());
@@ -71,7 +71,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $response = new \Yen\Handler\Response\Redirect('http://test.net');
 
         $view = new DefaultView($dc);
-        $vr = $view->handle('GET', $response);
+        $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(302, $vr->getStatusCode());
         $this->assertEquals(['Location' => 'http://test.net'], $vr->getHeaders());
@@ -84,7 +84,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $response = new \Yen\Handler\Response\Ok();
 
         $view = new CustomView($dc);
-        $vr = $view->handle('GET', $response);
+        $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(200, $vr->getStatusCode());
         $this->assertEquals(['Content-Type' => 'text/plain'], $vr->getHeaders());
@@ -97,7 +97,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $response = new \Yen\Handler\Response\ErrorNotFound('message');
 
         $view = new CustomView($dc);
-        $vr = $view->handle('GET', $response);
+        $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(404, $vr->getStatusCode());
         $this->assertEquals(['Content-Type' => 'text/plain'], $vr->getHeaders());
@@ -110,7 +110,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $response = new \Yen\Handler\Response\ErrorNotFound('message');
 
         $view = new NotFoundView($dc);
-        $vr = $view->handle('GET', $response);
+        $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(404, $vr->getStatusCode());
         $this->assertEquals(['Content-Type' => 'text/plain'], $vr->getHeaders());
@@ -123,7 +123,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $response = new \Yen\Handler\Response\Ok();
 
         $view = new MissedMethodView($dc);
-        $vr = $view->handle('GET', $response);
+        $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(200, $vr->getStatusCode());
         $this->assertEquals(['Content-Type' => 'text/plain'], $vr->getHeaders());

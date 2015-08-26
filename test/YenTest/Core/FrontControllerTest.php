@@ -64,7 +64,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
         $view = $this->getMockBuilder('\Yen\View\DefaultView')
                      ->disableOriginalConstructor()
                      ->getMock();
-        $view->method('handle')
+        $view->method('present')
              ->with(
                 $this->equalTo('GET'),
                 $this->isInstanceOf('\Yen\Handler\Response')
