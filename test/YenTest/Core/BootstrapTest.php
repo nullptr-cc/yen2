@@ -20,21 +20,21 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     {
         $dc = $this->mockDC();
         $bs = new Bootstrap();
-        $this->assertInstanceOf('\Yen\Handler\HandlerFactory', $bs->initHandlerFactory($dc));
+        $this->assertInstanceOf('\Yen\Handler\Contract\IHandlerFactory', $bs->initHandlerFactory($dc));
     }
 
     public function testInitViewFactory()
     {
         $dc = $this->mockDC();
         $bs = new Bootstrap();
-        $this->assertInstanceOf('\Yen\View\ViewFactory', $bs->initViewFactory($dc));
+        $this->assertInstanceOf('\Yen\View\Contract\IViewFactory', $bs->initViewFactory($dc));
     }
 
     public function testInitRendererFactory()
     {
         $dc = $this->mockDC();
         $bs = new Bootstrap();
-        $this->assertInstanceOf('\Yen\Renderer\RendererFactory', $bs->initRendererFactory($dc));
+        $this->assertInstanceOf('\Yen\Renderer\Contract\IRendererFactory', $bs->initRendererFactory($dc));
     }
 
     public function testInitUrlBuilder()
@@ -57,13 +57,13 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Yen\Router\Contract\IRouter', $cfg['router']($dc));
         $this->assertArrayHasKey('handler_factory', $cfg);
         $this->assertTrue(is_callable($cfg['handler_factory']));
-        $this->assertInstanceOf('\Yen\Handler\HandlerFactory', $cfg['handler_factory']($dc));
+        $this->assertInstanceOf('\Yen\Handler\Contract\IHandlerFactory', $cfg['handler_factory']($dc));
         $this->assertArrayHasKey('view_factory', $cfg);
         $this->assertTrue(is_callable($cfg['view_factory']));
-        $this->assertInstanceOf('\Yen\View\ViewFactory', $cfg['view_factory']($dc));
+        $this->assertInstanceOf('\Yen\View\Contract\IViewFactory', $cfg['view_factory']($dc));
         $this->assertArrayHasKey('renderer_factory', $cfg);
         $this->assertTrue(is_callable($cfg['renderer_factory']));
-        $this->assertInstanceOf('\Yen\Renderer\RendererFactory', $cfg['renderer_factory']($dc));
+        $this->assertInstanceOf('\Yen\Renderer\Contract\IRendererFactory', $cfg['renderer_factory']($dc));
         $this->assertArrayHasKey('url_builder', $cfg);
         $this->assertTrue(is_callable($cfg['url_builder']));
         $this->assertInstanceOf('\Yen\Core\UrlBuilder', $cfg['url_builder']($dc));

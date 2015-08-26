@@ -4,5 +4,6 @@ namespace Yen\Core\Contract;
 
 interface IDependencyContainer
 {
-    public function __call($method, $args);
+    public function has($name);
+    public function get($name);
 }

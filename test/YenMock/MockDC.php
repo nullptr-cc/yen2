@@ -10,7 +10,13 @@ trait MockDC
                    ->disableOriginalConstructor()
                    ->getMock();
 
-        $dc->method('__call')->will(
+        $dc->method('has')->will(
+            $this->returnCallback(function($arg) use ($map) {
+                return array_key_exists($arg, $map);
+            })
+        );
+
+        $dc->method('get')->will(
             $this->returnCallback(function($arg) use ($map) {
                 return $map[$arg];
             })

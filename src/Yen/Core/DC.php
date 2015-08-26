@@ -4,29 +4,30 @@ namespace Yen\Core;
 
 class DC implements Contract\IDependencyContainer
 {
+    protected $map;
     protected $repo;
-    protected $objects;
 
-    public function __construct(array $repo = [])
+    public function __construct(array $map = [])
     {
-        $this->repo = $repo;
-        $this->objects = [];
+        $this->map = $map;
+        $this->repo = [];
     }
 
-    public function __call($method, $args)
+    public function has($name)
     {
-        if (!isset($this->repo[$method])) {
-            throw new \BadMethodCallException(static::class . '::' . $method);
+        return array_key_exists($name, $this->map);
+    }
+
+    public function get($name)
+    {
+        if (!$this->has($name)) {
+            throw new \InvalidArgumentException('DC error: unknown name "' . $name . '"');
         };
 
-        if (!isset($this->objects[$method])) {
-            $this->objects[$method] = call_user_func($this->repo[$method], $this);
+        if (!isset($this->repo[$name])) {
+            $this->repo[$name] = call_user_func($this->map[$name], $this);
         };
 
-        if (!empty($args)) {
-            return call_user_func_array($this->objects[$method], $args);
-        };
-
-        return $this->objects[$method];
+        return $this->repo[$name];
     }
 }

@@ -6,25 +6,26 @@ use Yen\Core\DC;
 
 class DCTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSimple()
+    public function testHas()
     {
         $dc = new DC(['foo' => function() { return 'bar'; }]);
-        $this->assertEquals('bar', $dc->foo());
+        $this->assertTrue($dc->has('foo'));
+        $this->assertFalse($dc->has('baz'));
     }
 
-    public function testCallable()
+    public function testGet()
     {
-        $dc = new DC(['foo' => function() { return function($p) { return $p . $p; }; }]);
-        $this->assertEquals('barbar', $dc->foo('bar'));
+        $dc = new DC(['foo' => function() { return 'bar'; }]);
+        $this->assertEquals('bar', $dc->get('foo'));
     }
 
     /**
-     * @expectedException BadMethodCallException
-     * @expectedExceptionMessage Yen\Core\DC::foo
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage DC error: unknown name "foo"
      */
     public function testUndefined()
     {
         $dc = new DC();
-        $dc->foo();
+        $dc->get('foo');
     }
 }
