@@ -2,7 +2,7 @@
 
 namespace Yen\Handler;
 
-class MissedHandler
+class MissedHandler implements Contract\IHandler
 {
     protected $message;
 
@@ -11,7 +11,7 @@ class MissedHandler
         $this->message = $classname;
     }
 
-    public function handle($method, Request $request)
+    public function handle($method, Contract\IRequest $request)
     {
         return new Response\ErrorNotFound($this->message);
     }

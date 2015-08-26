@@ -4,7 +4,7 @@ namespace Yen\Handler;
 
 use Yen\Core;
 
-abstract class Handler
+abstract class Handler implements Contract\IHandler
 {
     protected $dc;
 
