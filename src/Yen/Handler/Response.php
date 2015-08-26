@@ -2,7 +2,7 @@
 
 namespace Yen\Handler;
 
-abstract class Response
+abstract class Response implements Contract\IResponse
 {
     protected $code;
     protected $data;

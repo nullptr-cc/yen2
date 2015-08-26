@@ -15,7 +15,7 @@ abstract class View
         $this->dc = $dc;
     }
 
-    public function handle($method, Handler\Response $response)
+    public function handle($method, Handler\Contract\IResponse $response)
     {
         $mname = $this->resolveMethodName($method, $response);
 
