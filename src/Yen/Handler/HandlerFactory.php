@@ -4,15 +4,25 @@ namespace Yen\Handler;
 
 use Yen\Core;
 
-class HandlerFactory implements Contract\IHandlerFactory
+class HandlerFactory implements Core\Contract\IFactory, Contract\IHandlerFactory
 {
     protected $dc;
     protected $format;
 
-    public function __construct(Core\Contract\IDependencyContainer $dc, $format = '\\%s')
+    public function __construct(Core\Contract\IContainer $dc, $format = '\\%s')
     {
         $this->dc = $dc;
         $this->format = $format;
+    }
+
+    public function make($name)
+    {
+        return $this->makeHandler($name);
+    }
+
+    public function canMake($name)
+    {
+        return class_exists($this->resolveClassname($name));
     }
 
     public function makeHandler($handler_name)

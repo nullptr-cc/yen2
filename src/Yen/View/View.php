@@ -10,7 +10,7 @@ abstract class View implements Contract\IView
 {
     protected $dc;
 
-    public function __construct(Core\Contract\IDependencyContainer $dc)
+    public function __construct(Core\Contract\IContainer $dc)
     {
         $this->dc = $dc;
     }

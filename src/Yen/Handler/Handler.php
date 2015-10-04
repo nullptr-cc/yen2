@@ -8,7 +8,7 @@ abstract class Handler implements Contract\IHandler
 {
     protected $dc;
 
-    public function __construct(Core\Contract\IDependencyContainer $dc)
+    public function __construct(Core\Contract\IContainer $dc)
     {
         $this->dc = $dc;
     }

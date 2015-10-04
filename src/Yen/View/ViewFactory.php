@@ -4,15 +4,25 @@ namespace Yen\View;
 
 use Yen\Core;
 
-class ViewFactory implements Contract\IViewFactory
+class ViewFactory implements Core\Contract\IFactory, Contract\IViewFactory
 {
     protected $dc;
     protected $view_format;
 
-    public function __construct(Core\Contract\IDependencyContainer $dc, $view_format = '\\%s')
+    public function __construct(Core\Contract\IContainer $dc, $view_format = '\\%s')
     {
         $this->dc = $dc;
         $this->view_format = $view_format;
+    }
+
+    public function make($name)
+    {
+        return $this->makeView($name);
+    }
+
+    public function canMake($name)
+    {
+        return class_exists($this->resolveClassname($name));
     }
 
     public function makeView($view_name)

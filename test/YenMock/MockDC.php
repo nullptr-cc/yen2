@@ -6,7 +6,7 @@ trait MockDC
 {
     protected function mockDC(array $map = [])
     {
-        $dc = $this->getMockBuilder('\Yen\Core\DC')
+        $dc = $this->getMockBuilder('\Yen\Core\MapRegistry')
                    ->disableOriginalConstructor()
                    ->getMock();
 

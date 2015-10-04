@@ -10,9 +10,8 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
     use \YenMock\MockRoute;
     use \YenMock\MockRouter;
     use \YenMock\MockServerRequest;
-    use \YenMock\MockHandlerFactory;
-    use \YenMock\MockViewFactory;
     use \YenMock\MockHttpResponse;
+    use \YenMock\MockRegistry;
 
     public function testProcessRequest()
     {
@@ -56,10 +55,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
                     new \Yen\Handler\Response\Ok()
                 );
 
-        $hfactory = $this->mockHandlerFactory();
-        $hfactory->method('makeHandler')
-                 ->with($this->equalTo('test'))
-                 ->willReturn($handler);
+        $hregistry = $this->mockRegistry();
+        $hregistry->expects($this->once())
+                  ->method('get')
+                  ->with($this->equalTo('test'))
+                  ->willReturn($handler);
 
         $view = $this->getMockBuilder('\Yen\View\DefaultView')
                      ->disableOriginalConstructor()
@@ -72,15 +72,16 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
                 $this->mockHttpResponse(200, ['Content-Type' => 'text/plain'], 'ok')
             );
 
-        $vfactory = $this->mockViewFactory();
-        $vfactory->method('makeView')
-                 ->with($this->equalTo('test'))
-                 ->willReturn($view);
+        $vregistry = $this->mockRegistry();
+        $vregistry->expects($this->once())
+                  ->method('get')
+                  ->with($this->equalTo('test'))
+                  ->willReturn($view);
 
         $dc = $this->mockDC([
             'router' => $router,
-            'handler_factory' => $hfactory,
-            'view_factory' => $vfactory
+            'handler_registry' => $hregistry,
+            'view_registry' => $vregistry
         ]);
 
         return [$dc, $request];

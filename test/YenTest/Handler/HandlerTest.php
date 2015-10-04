@@ -7,10 +7,11 @@ use Yen\Handler;
 class HandlerTest extends \PHPUnit_Framework_TestCase
 {
     use \YenMock\MockServerRequest;
+    use \YenMock\MockDC;
 
     public function testHandle()
     {
-        $dc = new \Yen\Core\DC();
+        $dc = $this->mockDC();
         $request = new Handler\Request($this->mockServerRequest());
         $handler = new CustomHandler($dc);
 
@@ -20,7 +21,7 @@ class HandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleInvalidMethod()
     {
-        $dc = new \Yen\Core\DC();
+        $dc = $this->mockDC();
         $request = new Handler\Request($this->mockServerRequest());
         $handler = new CustomHandler($dc);
 

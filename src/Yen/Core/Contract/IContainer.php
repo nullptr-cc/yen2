@@ -2,7 +2,7 @@
 
 namespace Yen\Core\Contract;
 
-interface IDependencyContainer
+interface IContainer
 {
     public function has($name);
     public function get($name);
