@@ -77,6 +77,6 @@ class UploadedFile
 
     protected function move($src, $dst)
     {
-        return move_uploaded_file($this->path, $target_path);
+        return move_uploaded_file($src, $dst);
     }
 }

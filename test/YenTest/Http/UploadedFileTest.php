@@ -110,4 +110,24 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
 
         $ufile->moveTo('vfs://target/test.txt');
     }
+
+    public function testMoveWithFuncMock()
+    {
+        $container = new \MicroVFS\Container();
+        $container->set('tmp/xxxxx.tmp', 'test text');
+        $container->setDir('target');
+        \MicroVFS\StreamWrapper::unregister('vfs');
+        \MicroVFS\StreamWrapper::register('vfs', $container);
+
+        $ufile = new Http\UploadedFile(UPLOAD_ERR_OK, 9, 'test.txt', 'text/plain', 'vfs://tmp/xxxxx.tmp');
+
+        \YenMock\mufTest(function ($src, $dst) {
+            $this->assertEquals('vfs://tmp/xxxxx.tmp', $src);
+            $this->assertEquals('vfs://target/test.txt', $dst);
+            return true;
+        });
+
+        $moved = $ufile->moveTo('vfs://target/test.txt');
+        $this->assertTrue($moved);
+    }
 }
