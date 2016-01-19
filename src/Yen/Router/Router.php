@@ -14,7 +14,8 @@ class Router implements Contract\IRouter
     public function route($uri)
     {
         foreach ($this->rules as $rule) {
-            if (false !== ($r = $rule->match($uri))) {
+            $r = $rule->match($uri);
+            if ($r->entry !== null) {
                 return new Route($r->entry, $r->args);
             };
         };
@@ -33,7 +34,7 @@ class Router implements Contract\IRouter
 
     public static function createDefault()
     {
-        return new self([new Rule('/', '$uri')]);
+        return new self([new Rule('/*', '$uri')]);
     }
 
     public static function createFromRulesFile($file_path)

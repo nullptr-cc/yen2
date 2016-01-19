@@ -17,28 +17,32 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('stdClass', $route);
         $this->assertObjectHasAttribute('entry', $route);
         $this->assertObjectHasAttribute('args', $route);
-        $this->assertEquals($entry, $route->entry);
-        $this->assertEquals($args, $route->args);
+        $this->assertSame($entry, $route->entry);
+        $this->assertSame($args, $route->args);
     }
 
     public function dataMatch()
     {
         return [
             ['/', '$uri', '/', '', []],
-            ['/', '$uri', '/test', 'test', []],
-            ['/', '$uri', '/test/foo', 'test/foo', []],
+            ['/', '$uri', '/test', null, []],
+            ['/*', '$uri', '/', '', []],
+            ['/*', '$uri', '/test', 'test', []],
+            ['/*', '$uri', '/test/foo/bar', 'test/foo/bar', []],
+            ['/+', '$uri', '/', null, []],
+            ['/+', '$uri', '/test', 'test', []],
+            ['/+', '$uri', '/test/foo/bar', 'test/foo/bar', []],
+            ['/test', 'test/foo/bar', '/test', 'test/foo/bar', []],
+            ['/test', 'test/foo/bar', '/test/foo', null, []],
             ['/test/:foo', 'test/info', '/test/bar', 'test/info', ['foo' => 'bar']],
             ['/test/:foo', 'test/info', '/test/baz', 'test/info', ['foo' => 'baz']],
             ['/test/:foo/(:bar = info)', 'test/$bar', '/test/baz', 'test/info', ['foo' => 'baz']],
-            ['/test/:foo/(:bar = info)', 'test/$bar', '/test/baz/bat', 'test/bat', ['foo' => 'baz']]
+            ['/test/:foo/(:bar = info)', 'test/$bar', '/test/baz/bat', 'test/bat', ['foo' => 'baz']],
+            ['/admin/*', 'cpanel/admin/$suffix', '/admin', 'cpanel/admin', []],
+            ['/admin/*', 'cpanel/admin/$suffix', '/admin/users', 'cpanel/admin/users', []],
+            ['/admin/+', 'cpanel/admin/$suffix', '/admin', null, []],
+            ['/admin/+', 'cpanel/admin/$suffix', '/admin/users', 'cpanel/admin/users', []],
         ];
-    }
-
-    public function testNotMatch()
-    {
-        $rule = new Rule('/test', 'test');
-
-        $this->assertFalse($rule->match('/foo/bar'));
     }
 
     /**

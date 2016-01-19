@@ -58,7 +58,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $rules = [
             '/test/:foo => test/info',
             '@fzz /fzz => test/fzz',
-            '/ => $uri',
+            '/* => $uri',
             'incorrect rule will be skipped'
         ];
 
@@ -92,5 +92,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     {
         \MicroVFS\StreamWrapper::register('mvfs', new \MicroVFS\Container());
         $router = Router::createFromRulesFile('mvfs://router.rules');
+        \MicroVFS\StreamWrapper::unregister('mvfs');
     }
 }
