@@ -4,8 +4,6 @@ namespace YenTest\Renderer;
 
 use Yen\Renderer\TemplateRenderer;
 
-include_once __DIR__ . '/../../MicroVFS.php';
-
 class TemplateRendererTest extends \PHPUnit_Framework_TestCase
 {
     public function testMime()

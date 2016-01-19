@@ -37,7 +37,7 @@ class Rule
         };
         $vars['uri'] = $uri;
 
-        $result = preg_replace_callback('~\$([a-z0-9_]+)~', function($m) use (&$vars) {
+        $result = preg_replace_callback('~\$([a-z0-9_]+)~', function ($m) use (&$vars) {
             $value = $vars[$m[1]];
             unset($vars[$m[1]]);
             return $value;
@@ -55,7 +55,7 @@ class Rule
     {
         $used_args = [];
 
-        $uri = preg_replace_callback('~\([^)]+\)~', function($m) use ($args, &$used_args) {
+        $uri = preg_replace_callback('~\([^)]+\)~', function ($m) use ($args, &$used_args) {
             $str = substr($m[0], 1, -1);
             if ($str[0] != ':') {
                 return $str;
@@ -65,7 +65,7 @@ class Rule
             return isset($args[$nv[0]]) ? $args[$nv[0]] : ((count($nv) == 1) ? '' : $nv[1]);
         }, $this->location);
 
-        $uri = preg_replace_callback('~:[a-z0-9_]+~', function($m) use ($args, &$used_args) {
+        $uri = preg_replace_callback('~:[a-z0-9_]+~', function ($m) use ($args, &$used_args) {
             $str = substr($m[0], 1);
             $used_args[$str] = true;
             return $args[$str];

@@ -69,7 +69,11 @@ class RuleTest extends \PHPUnit_Framework_TestCase
             ['/test/:foo', 'test/info', ['foo' => 'bar', 'baz' => 'bat'], '/test/bar', ['baz' => 'bat']],
             ['/test/:foo/(:bar = info)', 'test/$bar', ['foo' => 'baz'], '/test/baz/info', []],
             ['/test/:foo/(:bar = info)', 'test/$bar', ['foo' => 'baz', 'bar' => 'bat'], '/test/baz/bat', []],
-            ['/test/:foo/(:bar = info)', 'test/$bar', ['foo' => 'baz', 'bar' => 'bat', 'x' => 'y'], '/test/baz/bat', ['x' => 'y']],
+            [
+                '/test/:foo/(:bar = info)', 'test/$bar',
+                ['foo' => 'baz', 'bar' => 'bat', 'x' => 'y'],
+                '/test/baz/bat', ['x' => 'y']
+            ],
             ['/test/(foo)', 'test/foo', [], '/test/foo', []],
             ['/test/(:foo)', 'test/foo', ['foo' => 'bar'], '/test/bar', []],
             ['/test/(:foo)', 'test/foo', [], '/test/', []],

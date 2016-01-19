@@ -54,7 +54,10 @@ class UriTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/test/index.html', $uri->getPath());
         $this->assertEquals('foo=bar&a=12', $uri->getQuery());
         $this->assertEquals('test', $uri->getFragment());
-        $this->assertEquals('http://tester:seCrEt@testing.net:8080/test/index.html?foo=bar&a=12#test', $uri->__toString());
+        $this->assertEquals(
+            'http://tester:seCrEt@testing.net:8080/test/index.html?foo=bar&a=12#test',
+            $uri->__toString()
+        );
     }
 
     public function testCreateFromStringSimple()
@@ -82,7 +85,10 @@ class UriTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/test/index.html', $uri->getPath());
         $this->assertEquals('foo=bar&a=12', $uri->getQuery());
         $this->assertEquals('test', $uri->getFragment());
-        $this->assertEquals('http://tester:seCrEt@testing.net:8080/test/index.html?foo=bar&a=12#test', $uri->__toString());
+        $this->assertEquals(
+            'http://tester:seCrEt@testing.net:8080/test/index.html?foo=bar&a=12#test',
+            $uri->__toString()
+        );
     }
 
     public function testWithScheme()

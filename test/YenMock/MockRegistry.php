@@ -10,5 +10,4 @@ trait MockRegistry
                     ->disableOriginalConstructor()
                     ->getMock();
     }
-
 }

@@ -4,8 +4,6 @@ namespace YenTest\Http;
 
 use Yen\Http;
 
-include_once __DIR__ . '/../../MicroVFS.php';
-
 class UploadedFileTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetters()

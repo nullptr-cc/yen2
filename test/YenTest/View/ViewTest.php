@@ -5,36 +5,6 @@ namespace YenTest;
 use Yen\View\View;
 use Yen\View\DefaultView;
 
-class CustomView extends View
-{
-    protected function onGetOk($data)
-    {
-        $headers = ['Content-Type' => 'text/plain'];
-        $body = 'get ok';
-        return [$headers, $body];
-    }
-
-    protected function onGetError($data)
-    {
-        $headers = ['Content-Type' => 'text/plain'];
-        $body = 'get error: ' . $data;
-        return [$headers, $body];
-    }
-}
-
-class NotFoundView extends View
-{
-    protected function onGetErrorNotFound($data)
-    {
-        $headers = ['Content-Type' => 'text/plain'];
-        $body = 'get error not found: ' . $data;
-        return [$headers, $body];
-    }
-}
-
-class MissedMethodView extends View
-{}
-
 class ViewTest extends \PHPUnit_Framework_TestCase
 {
     use \YenMock\MockDC;
@@ -83,7 +53,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\Ok();
 
-        $view = new CustomView($dc);
+        $view = new \YenMock\View\CustomView($dc);
         $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(200, $vr->getStatusCode());
@@ -96,7 +66,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\ErrorNotFound('message');
 
-        $view = new CustomView($dc);
+        $view = new \YenMock\View\CustomView($dc);
         $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(404, $vr->getStatusCode());
@@ -109,7 +79,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\ErrorNotFound('message');
 
-        $view = new NotFoundView($dc);
+        $view = new \YenMock\View\NotFoundView($dc);
         $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(404, $vr->getStatusCode());
@@ -122,7 +92,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $dc = $this->mockDC();
         $response = new \Yen\Handler\Response\Ok();
 
-        $view = new MissedMethodView($dc);
+        $view = new \YenMock\View\MissedMethodView($dc);
         $vr = $view->present('GET', $response);
         $this->assertInstanceOf('\Yen\Http\Response', $vr);
         $this->assertEquals(200, $vr->getStatusCode());

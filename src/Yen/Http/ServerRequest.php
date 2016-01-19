@@ -14,8 +14,13 @@ class ServerRequest implements Contract\IServerRequest
     protected $files;
     protected $uri;
 
-    public function __construct(array $env = [], array $query = [], array $body = [], array $cookies = [], array $files = [])
-    {
+    public function __construct(
+        array $env = [],
+        array $query = [],
+        array $body = [],
+        array $cookies = [],
+        array $files = []
+    ) {
         $this->env = $env;
         $this->method = isset($env['REQUEST_METHOD']) ? $env['REQUEST_METHOD'] : null;
         $this->target = isset($env['REQUEST_URI']) ? $env['REQUEST_URI'] : '/';
@@ -116,7 +121,7 @@ class ServerRequest implements Contract\IServerRequest
 
     public static function fillFiles(array $files)
     {
-        $create = function($inf) {
+        $create = function ($inf) {
             return new UploadedFile($inf['error'], $inf['size'], $inf['name'], $inf['type'], $inf['tmp_name']);
         };
 

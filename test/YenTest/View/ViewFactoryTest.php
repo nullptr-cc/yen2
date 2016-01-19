@@ -5,8 +5,6 @@ namespace YenTest\View;
 use Yen\View\View;
 use Yen\View\ViewFactory;
 
-class CustomView extends View {};
-
 class ViewFactoryTest extends \PHPUnit_Framework_TestCase
 {
     use \YenMock\MockDC;
@@ -14,17 +12,17 @@ class ViewFactoryTest extends \PHPUnit_Framework_TestCase
     public function testMake()
     {
         $dc = $this->mockDC();
-        $factory = new ViewFactory($dc, '\YenTest\View\%sView');
+        $factory = new ViewFactory($dc, '\YenMock\View\%sView');
         $view = $factory->makeView('custom');
-        $this->assertInstanceOf('\YenTest\View\CustomView', $view);
+        $this->assertInstanceOf('\YenMock\View\CustomView', $view);
         $view = $factory->make('custom');
-        $this->assertInstanceOf('\YenTest\View\CustomView', $view);
+        $this->assertInstanceOf('\YenMock\View\CustomView', $view);
     }
 
     public function testMakeNull()
     {
         $dc = $this->mockDC();
-        $factory = new ViewFactory($dc, '\YenTest\View\%s');
+        $factory = new ViewFactory($dc, '\YenMock\View\%s');
         $view = $factory->makeView('fake');
         $this->assertInstanceOf('\Yen\View\DefaultView', $view);
         $view = $factory->make('fake');
@@ -34,7 +32,7 @@ class ViewFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCanMake()
     {
         $dc = $this->mockDC();
-        $factory = new ViewFactory($dc, '\YenTest\View\%sView');
+        $factory = new ViewFactory($dc, '\YenMock\View\%sView');
         $this->assertTrue($factory->canMake('custom'));
         $this->assertFalse($factory->canMake('fake'));
     }

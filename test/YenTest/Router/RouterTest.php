@@ -2,8 +2,6 @@
 
 namespace YenTest;
 
-include_once __DIR__ . '/../../MicroVFS.php';
-
 use Yen\Router\Router;
 use Yen\Router\Rule;
 

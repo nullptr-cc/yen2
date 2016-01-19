@@ -26,6 +26,6 @@ class HandlerTest extends \PHPUnit_Framework_TestCase
         $handler = new CustomHandler($dc);
 
         $hr = $handler->handle('POST', $request);
-        $this->assertInstanceOf('\Yen\Handler\Response\ErrorInvalidMethod',  $hr);
+        $this->assertInstanceOf('\Yen\Handler\Response\ErrorInvalidMethod', $hr);
     }
 }

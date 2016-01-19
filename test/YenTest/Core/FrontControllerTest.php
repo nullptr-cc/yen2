@@ -66,11 +66,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
                      ->getMock();
         $view->method('present')
              ->with(
-                $this->equalTo('GET'),
-                $this->isInstanceOf('\Yen\Handler\Response')
+                 $this->equalTo('GET'),
+                 $this->isInstanceOf('\Yen\Handler\Response')
              )->willReturn(
-                $this->mockHttpResponse(200, ['Content-Type' => 'text/plain'], 'ok')
-            );
+                 $this->mockHttpResponse(200, ['Content-Type' => 'text/plain'], 'ok')
+             );
 
         $vregistry = $this->mockRegistry();
         $vregistry->expects($this->once())
