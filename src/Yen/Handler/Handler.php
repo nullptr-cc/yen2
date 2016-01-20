@@ -24,4 +24,29 @@ abstract class Handler implements Contract\IHandler
 
         return $this->{$on_name}($request);
     }
+
+    protected function ok($data)
+    {
+        return new Response\Ok($data);
+    }
+
+    protected function invalidParams($data)
+    {
+        return new Response\ErrorInvalidParams($data);
+    }
+
+    protected function forbidden($data)
+    {
+        return new Response\ErrorForbidden($data);
+    }
+
+    protected function notFound($data)
+    {
+        return new Response\ErrorNotFound($data);
+    }
+
+    protected function error($data)
+    {
+        return new Response\ErrorInternal($data);
+    }
 }
