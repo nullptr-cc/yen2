@@ -22,7 +22,7 @@ class ViewFactory implements Core\Contract\IFactory, Contract\IViewFactory
 
     public function canMake($name)
     {
-        return class_exists($this->resolveClassname($name));
+        return true;
     }
 
     public function makeView($view_name)

@@ -8,7 +8,7 @@ class MissedHandler implements Contract\IHandler
 
     public function __construct($classname)
     {
-        $this->message = $classname;
+        $this->message = 'Handler class ' . $classname . ' not found';
     }
 
     public function handle($method, Contract\IRequest $request)

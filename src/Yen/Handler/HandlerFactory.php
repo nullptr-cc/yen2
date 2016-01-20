@@ -22,7 +22,7 @@ class HandlerFactory implements Core\Contract\IFactory, Contract\IHandlerFactory
 
     public function canMake($name)
     {
-        return class_exists($this->resolveClassname($name));
+        return true;
     }
 
     public function makeHandler($handler_name)
