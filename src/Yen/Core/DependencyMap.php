@@ -2,16 +2,32 @@
 
 namespace Yen\Core;
 
-class DependencyMap
+class DependencyMap implements Contract\IContainer
 {
-    public function get()
+    protected $map;
+
+    public function __construct()
     {
-        return [
+        $this->map = [
             'router' => [$this, 'makeRouter'],
             'handler_registry' => [$this, 'makeHandlerRegistry'],
             'view_registry' => [$this, 'makeViewRegistry'],
             'url_builder' => [$this, 'makeUrlBuilder'],
         ];
+    }
+
+    public function has($key)
+    {
+        return array_key_exists($key, $this->map);
+    }
+
+    public function get($key)
+    {
+        if (!$this->has($key)) {
+            throw new \OutOfBoundsException('unknown key ' . $key);
+        };
+
+        return $this->map[$key];
     }
 
     public function makeRouter(Contract\IContainer $dc)
