@@ -37,25 +37,34 @@ class DependencyMapTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Yen\Core\UrlBuilder', $bs->makeUrlBuilder($dc));
     }
 
-    public function testget()
+    public function testHas()
     {
-        $dc = $this->mockDC(['router' => $this->mockRouter()]);
-        $bs = new DependencyMap();
-        $cfg = $bs->get();
+        $dep_map = new DependencyMap();
 
-        $this->assertInternalType('array', $cfg);
-        $this->assertCount(4, $cfg);
-        $this->assertArrayHasKey('router', $cfg);
-        $this->assertTrue(is_callable($cfg['router']));
-        $this->assertInstanceOf('\Yen\Router\Contract\IRouter', $cfg['router']($dc));
-        $this->assertArrayHasKey('handler_registry', $cfg);
-        $this->assertTrue(is_callable($cfg['handler_registry']));
-        $this->assertInstanceOf('\Yen\Core\FactoryRegistry', $cfg['handler_registry']($dc));
-        $this->assertArrayHasKey('view_registry', $cfg);
-        $this->assertTrue(is_callable($cfg['view_registry']));
-        $this->assertInstanceOf('\Yen\Core\FactoryRegistry', $cfg['view_registry']($dc));
-        $this->assertArrayHasKey('url_builder', $cfg);
-        $this->assertTrue(is_callable($cfg['url_builder']));
-        $this->assertInstanceOf('\Yen\Core\UrlBuilder', $cfg['url_builder']($dc));
+        $this->assertTrue($dep_map->has('router'));
+        $this->assertTrue($dep_map->has('handler_registry'));
+        $this->assertTrue($dep_map->has('view_registry'));
+        $this->assertTrue($dep_map->has('url_builder'));
+        $this->assertFalse($dep_map->has('foo'));
+    }
+
+    public function testGet()
+    {
+        $dep_map = new DependencyMap();
+
+        $this->assertTrue(is_callable($dep_map->get('router')));
+        $this->assertTrue(is_callable($dep_map->get('handler_registry')));
+        $this->assertTrue(is_callable($dep_map->get('view_registry')));
+        $this->assertTrue(is_callable($dep_map->get('url_builder')));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     * @expectedExceptionMessage unknown key foo
+     */
+    public function testGetException()
+    {
+        $dep_map = new DependencyMap();
+        $dep_map->get('foo');
     }
 }

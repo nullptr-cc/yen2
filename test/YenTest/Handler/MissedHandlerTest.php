@@ -15,6 +15,6 @@ class MissedHandlerTest extends \PHPUnit_Framework_TestCase
 
         $hr = $handler->handle('GET', $request);
         $this->assertInstanceOf('\Yen\Handler\Response\ErrorNotFound', $hr);
-        $this->assertEquals('MissedHandlerClass', $hr->data());
+        $this->assertEquals('Handler class MissedHandlerClass not found', $hr->data());
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace YenTest\Handler;
+namespace YenMock\Handler;
 
 class CustomHandler extends \Yen\Handler\Handler
 {

@@ -34,6 +34,6 @@ class ViewFactoryTest extends \PHPUnit_Framework_TestCase
         $dc = $this->mockDC();
         $factory = new ViewFactory($dc, '\YenMock\View\%sView');
         $this->assertTrue($factory->canMake('custom'));
-        $this->assertFalse($factory->canMake('fake'));
+        $this->assertTrue($factory->canMake('fake'));
     }
 }

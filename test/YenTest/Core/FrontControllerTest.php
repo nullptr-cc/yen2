@@ -44,7 +44,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
         $router->method('route')
                ->willReturn($this->mockRoute('test'));
 
-        $handler = $this->getMockBuilder('\YenTest\Handler\CustomHandler')
+        $handler = $this->getMockBuilder('\YenMock\Handler\CustomHandler')
                         ->disableOriginalConstructor()
                         ->getMock();
         $handler->method('handle')

@@ -11,11 +11,11 @@ class HandlerFactoryTest extends \PHPUnit_Framework_TestCase
     public function testMakeCustomHandler()
     {
         $dc = $this->mockDC();
-        $factory = new Handler\HandlerFactory($dc, '\YenTest\Handler\%sHandler');
+        $factory = new Handler\HandlerFactory($dc, '\YenMock\Handler\%sHandler');
         $handler = $factory->makeHandler('custom');
-        $this->assertInstanceOf('\YenTest\Handler\CustomHandler', $handler);
+        $this->assertInstanceOf('\YenMock\Handler\CustomHandler', $handler);
         $handler = $factory->make('custom');
-        $this->assertInstanceOf('\YenTest\Handler\CustomHandler', $handler);
+        $this->assertInstanceOf('\YenMock\Handler\CustomHandler', $handler);
     }
 
     public function testMakeNullHandler()
@@ -31,8 +31,8 @@ class HandlerFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCanMake()
     {
         $dc = $this->mockDC();
-        $factory = new Handler\HandlerFactory($dc, '\YenTest\Handler\%sHandler');
+        $factory = new Handler\HandlerFactory($dc, '\YenMock\Handler\%sHandler');
         $this->assertTrue($factory->canMake('custom'));
-        $this->assertFalse($factory->canMake('fake'));
+        $this->assertTrue($factory->canMake('fake'));
     }
 }
