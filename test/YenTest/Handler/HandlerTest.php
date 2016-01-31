@@ -9,13 +9,11 @@ use YenMock\Handler\RevealingHandler;
 class HandlerTest extends \PHPUnit_Framework_TestCase
 {
     use \YenMock\MockServerRequest;
-    use \YenMock\MockDC;
 
     public function testHandle()
     {
-        $dc = $this->mockDC();
         $request = new Handler\Request($this->mockServerRequest());
-        $handler = new CustomHandler($dc);
+        $handler = new CustomHandler();
 
         $hr = $handler->handle('GET', $request);
         $this->assertInstanceOf('\Yen\Handler\Response\Ok', $hr);
@@ -23,9 +21,8 @@ class HandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleInvalidMethod()
     {
-        $dc = $this->mockDC();
         $request = new Handler\Request($this->mockServerRequest());
-        $handler = new CustomHandler($dc);
+        $handler = new CustomHandler();
 
         $hr = $handler->handle('POST', $request);
         $this->assertInstanceOf('\Yen\Handler\Response\ErrorInvalidMethod', $hr);
@@ -33,7 +30,7 @@ class HandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testShortcuts()
     {
-        $handler = new RevealingHandler($this->mockDC());
+        $handler = new RevealingHandler();
 
         $resp = $handler->ok('data-ok');
         $this->assertInstanceOf('\Yen\Handler\Response\Ok', $resp);

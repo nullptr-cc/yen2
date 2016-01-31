@@ -2,16 +2,15 @@
 
 namespace Yen\View;
 
-use Yen\Core;
+use Yen\Util\Contract\IFactory;
+use Yen\View\Contract\IViewFactory;
 
-class ViewFactory implements Core\Contract\IFactory, Contract\IViewFactory
+class ViewFactory implements IFactory, IViewFactory
 {
-    protected $dc;
     protected $view_format;
 
-    public function __construct(Core\Contract\IContainer $dc, $view_format = '\\%s')
+    public function __construct($view_format = '\\%s')
     {
-        $this->dc = $dc;
         $this->view_format = $view_format;
     }
 
@@ -37,12 +36,12 @@ class ViewFactory implements Core\Contract\IFactory, Contract\IViewFactory
 
     protected function makeExistentView($classname)
     {
-        return new $classname($this->dc);
+        return new $classname();
     }
 
     protected function makeDefaultView($classname)
     {
-        return new DefaultView($this->dc);
+        return new DefaultView();
     }
 
     protected function resolveClassname($view_name)

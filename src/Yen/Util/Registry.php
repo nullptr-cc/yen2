@@ -1,6 +1,6 @@
 <?php
 
-namespace Yen\Core;
+namespace Yen\Util;
 
 abstract class Registry implements Contract\IContainer
 {

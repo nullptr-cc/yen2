@@ -1,8 +1,8 @@
 <?php
 
-namespace YenTest\Core;
+namespace YenTest\Util;
 
-use Yen\Core\UrlBuilder;
+use Yen\Util\UrlBuilder;
 
 class UrlBuilderTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,7 +2,7 @@
 
 namespace YenMock;
 
-class DummyFactory implements \Yen\Core\Contract\IFactory
+class DummyFactory implements \Yen\Util\Contract\IFactory
 {
     public function make($name)
     {

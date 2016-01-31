@@ -9,17 +9,17 @@ class FrontController
 {
     protected $dc;
 
-    public function __construct(Contract\IContainer $dc)
+    public function __construct(Contract\IDependencyContainer $dc)
     {
         $this->dc = $dc;
     }
 
     public function processRequest(Http\Contract\IServerRequest $request)
     {
-        $route = $this->dc->get('router')->route($request->getUri()->getPath());
-        $handler = $this->dc->get('handler_registry')->get($route->entry());
+        $route = $this->dc->getRouter()->route($request->getUri()->getPath());
+        $handler = $this->dc->getHandlerRegistry()->get($route->entry());
         $response = $handler->handle($request->getMethod(), $this->makeHandlerRequest($request, $route->arguments()));
-        $view = $this->dc->get('view_registry')->get($route->entry());
+        $view = $this->dc->getViewRegistry()->get($route->entry());
 
         return $view->present($request->getMethod(), $response);
     }

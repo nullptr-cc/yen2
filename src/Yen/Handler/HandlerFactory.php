@@ -2,16 +2,15 @@
 
 namespace Yen\Handler;
 
-use Yen\Core;
+use Yen\Util\Contract\IFactory;
+use Yen\Handler\Contract\IHandlerFactory;
 
-class HandlerFactory implements Core\Contract\IFactory, Contract\IHandlerFactory
+class HandlerFactory implements IFactory, IHandlerFactory
 {
-    protected $dc;
     protected $format;
 
-    public function __construct(Core\Contract\IContainer $dc, $format = '\\%s')
+    public function __construct($format = '\\%s')
     {
-        $this->dc = $dc;
         $this->format = $format;
     }
 
@@ -37,7 +36,7 @@ class HandlerFactory implements Core\Contract\IFactory, Contract\IHandlerFactory
 
     protected function makeExistentHandler($classname)
     {
-        return new $classname($this->dc);
+        return new $classname();
     }
 
     protected function makeMissedHandler($classname)

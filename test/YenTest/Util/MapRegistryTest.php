@@ -1,33 +1,33 @@
 <?php
 
-namespace YenTest\Core;
+namespace YenTest\Util;
 
-use Yen\Core\MapRegistry;
+use Yen\Util\MapRegistry;
 use YenMock\ArrayContainer;
 
 class MapRegistryTest extends \PHPUnit_Framework_TestCase
 {
     public function testHas()
     {
-        $dc = new MapRegistry(new ArrayContainer([
+        $mr = new MapRegistry(new ArrayContainer([
             'foo' => function () {
                 return 'bar';
             }
         ]));
 
-        $this->assertTrue($dc->has('foo'));
-        $this->assertFalse($dc->has('baz'));
+        $this->assertTrue($mr->has('foo'));
+        $this->assertFalse($mr->has('baz'));
     }
 
     public function testGet()
     {
-        $dc = new MapRegistry(new ArrayContainer([
+        $mr = new MapRegistry(new ArrayContainer([
             'foo' => function () {
                 return 'bar';
             }
         ]));
 
-        $this->assertEquals('bar', $dc->get('foo'));
+        $this->assertEquals('bar', $mr->get('foo'));
     }
 
     /**
@@ -36,7 +36,7 @@ class MapRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testUndefined()
     {
-        $dc = new MapRegistry(new ArrayContainer([]));
-        $dc->get('foo');
+        $mr = new MapRegistry(new ArrayContainer([]));
+        $mr->get('foo');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Yen\Core;
+namespace Yen\Util;
 
 class MapRegistry extends Registry
 {

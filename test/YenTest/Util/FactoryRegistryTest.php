@@ -1,8 +1,8 @@
 <?php
 
-namespace YenTest\Core;
+namespace YenTest\Util;
 
-use Yen\Core\FactoryRegistry;
+use Yen\Util\FactoryRegistry;
 
 class FactoryRegistryTest extends \PHPUnit_Framework_TestCase
 {

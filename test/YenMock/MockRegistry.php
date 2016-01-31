@@ -6,7 +6,7 @@ trait MockRegistry
 {
     protected function mockRegistry()
     {
-        return $this->getMockBuilder('\Yen\Core\FactoryRegistry')
+        return $this->getMockBuilder('\Yen\Util\FactoryRegistry')
                     ->disableOriginalConstructor()
                     ->getMock();
     }

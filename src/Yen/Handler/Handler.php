@@ -6,13 +6,6 @@ use Yen\Core;
 
 abstract class Handler implements Contract\IHandler
 {
-    protected $dc;
-
-    public function __construct(Core\Contract\IContainer $dc)
-    {
-        $this->dc = $dc;
-    }
-
     public function handle($method, Contract\IRequest $request)
     {
         $name = ucfirst(strtolower($method));

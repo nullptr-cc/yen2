@@ -1,6 +1,6 @@
 <?php
 
-namespace Yen\Core;
+namespace Yen\Util;
 
 use Yen\Http;
 use Yen\Router;

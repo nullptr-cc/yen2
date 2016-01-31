@@ -8,13 +8,6 @@ use Yen\Handler;
 
 abstract class View implements Contract\IView
 {
-    protected $dc;
-
-    public function __construct(Core\Contract\IContainer $dc)
-    {
-        $this->dc = $dc;
-    }
-
     public function present($method, Handler\Contract\IResponse $response)
     {
         $mname = $this->resolveMethodName($method, $response);

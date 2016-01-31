@@ -6,7 +6,7 @@ use Yen\Core;
 
 class FrontControllerTest extends \PHPUnit_Framework_TestCase
 {
-    use \YenMock\MockDC;
+    use \YenMock\MockDependencyContainer;
     use \YenMock\MockRoute;
     use \YenMock\MockRouter;
     use \YenMock\MockServerRequest;
@@ -78,11 +78,13 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
                   ->with($this->equalTo('test'))
                   ->willReturn($view);
 
-        $dc = $this->mockDC([
-            'router' => $router,
-            'handler_registry' => $hregistry,
-            'view_registry' => $vregistry
-        ]);
+        $dc = $this->mockDependencyContainer();
+        $dc->method('getRouter')
+           ->willReturn($router);
+        $dc->method('getHandlerRegistry')
+           ->willReturn($hregistry);
+        $dc->method('getViewRegistry')
+           ->willReturn($vregistry);
 
         return [$dc, $request];
     }

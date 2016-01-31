@@ -2,7 +2,7 @@
 
 namespace YenMock;
 
-class ArrayContainer extends \ArrayObject implements \Yen\Core\Contract\IContainer
+class ArrayContainer extends \ArrayObject implements \Yen\Util\Contract\IContainer
 {
     public function has($key)
     {

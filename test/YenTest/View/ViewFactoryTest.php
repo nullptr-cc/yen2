@@ -7,12 +7,9 @@ use Yen\View\ViewFactory;
 
 class ViewFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    use \YenMock\MockDC;
-
     public function testMake()
     {
-        $dc = $this->mockDC();
-        $factory = new ViewFactory($dc, '\YenMock\View\%sView');
+        $factory = new ViewFactory('\YenMock\View\%sView');
         $view = $factory->makeView('custom');
         $this->assertInstanceOf('\YenMock\View\CustomView', $view);
         $view = $factory->make('custom');
@@ -21,8 +18,7 @@ class ViewFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testMakeNull()
     {
-        $dc = $this->mockDC();
-        $factory = new ViewFactory($dc, '\YenMock\View\%s');
+        $factory = new ViewFactory('\YenMock\View\%s');
         $view = $factory->makeView('fake');
         $this->assertInstanceOf('\Yen\View\DefaultView', $view);
         $view = $factory->make('fake');
@@ -31,8 +27,7 @@ class ViewFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCanMake()
     {
-        $dc = $this->mockDC();
-        $factory = new ViewFactory($dc, '\YenMock\View\%sView');
+        $factory = new ViewFactory('\YenMock\View\%sView');
         $this->assertTrue($factory->canMake('custom'));
         $this->assertTrue($factory->canMake('fake'));
     }

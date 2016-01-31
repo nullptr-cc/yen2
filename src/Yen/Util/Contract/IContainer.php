@@ -1,6 +1,6 @@
 <?php
 
-namespace Yen\Core\Contract;
+namespace Yen\Util\Contract;
 
 interface IContainer
 {
