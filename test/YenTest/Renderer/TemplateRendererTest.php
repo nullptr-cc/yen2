@@ -31,6 +31,20 @@ class TemplateRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('content: foo = baz', $body);
     }
 
+    public function testPartial()
+    {
+        $container = new \MicroVFS\Container();
+        $container->set('tpl/test.tpl', 'content: foo = <?= $this->partial("foo", ["x" => 5]) ?>');
+        $container->set('tpl/foo.tpl', '"x: <?= $x ?>"');
+        \MicroVFS\StreamWrapper::unregister('vfs');
+        \MicroVFS\StreamWrapper::register('vfs', $container);
+
+        $renderer = new TemplateRenderer('vfs://tpl');
+        list($headers, $body) = $renderer->render([], 'test');
+        $this->assertEquals(['Content-Type' => 'text/plain'], $headers);
+        $this->assertEquals('content: foo = "x: 5"', $body);
+    }
+
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Missed start template
