@@ -45,6 +45,11 @@ class TemplateRenderer implements Contract\IRenderer
         return ob_get_clean();
     }
 
+    protected function partial($tpl, array $args)
+    {
+        return $this->fetch($args, $tpl);
+    }
+
     protected function resolveTplPath($tpl)
     {
         return sprintf('%s/%s%s', $this->tpl_dir, $tpl, $this->tpl_ext);
