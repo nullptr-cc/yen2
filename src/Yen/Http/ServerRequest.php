@@ -114,6 +114,28 @@ class ServerRequest implements Contract\IServerRequest
         return is_array($this->headers[$name]) ? implode(',', $this->headers[$name]) : $this->headers[$name];
     }
 
+    public function withQueryParams(array $params)
+    {
+        return new self(
+            $this->env,
+            $params,
+            $this->body,
+            $this->cookies,
+            $this->files
+        );
+    }
+
+    public function withJoinedQueryParams(array $params)
+    {
+        return new self(
+            $this->env,
+            array_merge($this->query, $params),
+            $this->body,
+            $this->cookies,
+            $this->files
+        );
+    }
+
     protected static function makeUri(array $args)
     {
         return new Uri($args);

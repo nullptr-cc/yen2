@@ -16,4 +16,7 @@ interface IServerRequest
     public function hasHeader($name);
     public function getHeader($name);
     public function getHeaderLine($name);
+
+    public function withQueryParams(array $params);
+    public function withJoinedQueryParams(array $params);
 }

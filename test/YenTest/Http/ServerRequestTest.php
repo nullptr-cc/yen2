@@ -162,4 +162,30 @@ class ServerRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('text/plain', $ufile->getClientMediaType());
         $this->assertEquals(2, $ufile->getSize());
     }
+
+    public function testWithQueryParams()
+    {
+        $request = new Http\ServerRequest();
+        $request = $request->withQueryParams(['foo' => 'bar']);
+
+        $this->assertSame(['foo' => 'bar'], $request->getQueryParams());
+
+        $request = new Http\ServerRequest([], ['foo' => 'bar']);
+        $request = $request->withQueryParams(['bar' => 'baz']);
+
+        $this->assertSame(['bar' => 'baz'], $request->getQueryParams());
+    }
+
+    public function testWithJoinedQueryParams()
+    {
+        $request = new Http\ServerRequest();
+        $request = $request->withJoinedQueryParams(['foo' => 'bar']);
+
+        $this->assertSame(['foo' => 'bar'], $request->getQueryParams());
+
+        $request = new Http\ServerRequest([], ['foo' => 'bar']);
+        $request = $request->withJoinedQueryParams(['bar' => 'baz']);
+
+        $this->assertSame(['foo' => 'bar','bar' => 'baz'], $request->getQueryParams());
+    }
 }
