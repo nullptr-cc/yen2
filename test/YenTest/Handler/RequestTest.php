@@ -23,7 +23,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testArgumentFromRequest()
     {
-        $hrequest = new Handler\Request($this->mockServerRequest(['foo' => 'bar']));
+        $hrequest = new Handler\Request($this->mockServerRequest('GET', ['foo' => 'bar']));
         $this->assertEquals('bar', $hrequest->argument('foo'));
     }
 
@@ -31,6 +31,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $hrequest = new Handler\Request(
             $this->mockServerRequest(
+                'GET',
                 ['foo' => 'bar', 'baz' => 'g-bat', 'bap' => 'g-bam'],
                 ['baz' => 'p-bat', 'bap' => 'p-bam']
             ),
@@ -43,7 +44,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testXtraArgument()
     {
-        $srequest = $this->mockServerRequest([], [], ['x-foo' => 'bar']);
+        $srequest = $this->mockServerRequest('GET', [], [], ['x-foo' => 'bar']);
         $hrequest = new Handler\Request($srequest);
         $this->assertEquals('bar', $hrequest->argument('x-foo'));
         $this->assertNull($hrequest->argument('x-baz'));

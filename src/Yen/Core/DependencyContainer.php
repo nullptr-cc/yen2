@@ -37,12 +37,12 @@ class DependencyContainer implements Contract\IDependencyContainer
 
     protected function makeHandlerRegistry()
     {
-        return new \Yen\Util\FactoryRegistry($this->makeHandlerFactory());
+        return new \Yen\Handler\HandlerRegistry($this->makeHandlerFactory());
     }
 
     protected function makeViewRegistry()
     {
-        return new \Yen\Util\FactoryRegistry($this->makeViewFactory());
+        return new \Yen\View\ViewRegistry($this->makeViewFactory());
     }
 
     protected function makeHandlerFactory()

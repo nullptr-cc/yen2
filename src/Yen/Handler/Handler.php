@@ -3,12 +3,13 @@
 namespace Yen\Handler;
 
 use Yen\Core;
+use Yen\Http;
 
 abstract class Handler implements Contract\IHandler
 {
-    public function handle($method, Contract\IRequest $request)
+    public function handle(Http\Contract\IServerRequest $request)
     {
-        $name = ucfirst(strtolower($method));
+        $name = ucfirst(strtolower($request->getMethod()));
         $on_name = 'on' . $name;
 
         if (!method_exists($this, $on_name)) {

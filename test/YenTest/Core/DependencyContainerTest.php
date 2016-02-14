@@ -19,7 +19,7 @@ class DependencyContainerTest extends \PHPUnit_Framework_TestCase
         $dc = new DependencyContainer();
         $handler_registry = $dc->getHandlerRegistry();
 
-        $this->assertInstanceOf(\Yen\Util\FactoryRegistry::class, $handler_registry);
+        $this->assertInstanceOf(\Yen\Handler\Contract\IHandlerRegistry::class, $handler_registry);
     }
 
     public function testGetViewRegistry()
@@ -27,6 +27,6 @@ class DependencyContainerTest extends \PHPUnit_Framework_TestCase
         $dc = new DependencyContainer();
         $view_registry = $dc->getViewRegistry();
 
-        $this->assertInstanceOf(\Yen\Util\FactoryRegistry::class, $view_registry);
+        $this->assertInstanceOf(\Yen\View\Contract\IViewRegistry::class, $view_registry);
     }
 }

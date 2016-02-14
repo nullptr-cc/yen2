@@ -12,19 +12,19 @@ class HandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandle()
     {
-        $request = new Handler\Request($this->mockServerRequest());
+        $request = $this->mockServerRequest('GET');
         $handler = new CustomHandler();
 
-        $hr = $handler->handle('GET', $request);
+        $hr = $handler->handle($request);
         $this->assertInstanceOf('\Yen\Handler\Response\Ok', $hr);
     }
 
     public function testHandleInvalidMethod()
     {
-        $request = new Handler\Request($this->mockServerRequest());
+        $request = $this->mockServerRequest('POST');
         $handler = new CustomHandler();
 
-        $hr = $handler->handle('POST', $request);
+        $hr = $handler->handle($request);
         $this->assertInstanceOf('\Yen\Handler\Response\ErrorInvalidMethod', $hr);
     }
 

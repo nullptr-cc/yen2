@@ -2,6 +2,8 @@
 
 namespace Yen\Handler;
 
+use Yen\Http;
+
 class MissedHandler implements Contract\IHandler
 {
     protected $message;
@@ -11,7 +13,7 @@ class MissedHandler implements Contract\IHandler
         $this->message = 'Handler class ' . $classname . ' not found';
     }
 
-    public function handle($method, Contract\IRequest $request)
+    public function handle(Http\Contract\IServerRequest $request)
     {
         return new Response\ErrorNotFound($this->message);
     }

@@ -3,29 +3,42 @@
 namespace Yen\Core;
 
 use Yen\Http;
+use Yen\Router;
 use Yen\Handler;
+use Yen\View;
 
 class FrontController
 {
-    protected $dc;
+    protected $router;
+    protected $handler_registry;
+    protected $view_registry;
 
-    public function __construct(Contract\IDependencyContainer $dc)
+    public function __construct(
+        Router\Contract\IRouter $router,
+        Handler\Contract\IHandlerRegistry $handler_registry,
+        View\Contract\IViewRegistry $view_registry
+    ) {
+        $this->router = $router;
+        $this->handler_registry = $handler_registry;
+        $this->view_registry = $view_registry;
+    }
+
+    public static function createFromDC(Contract\IDependencyContainer $dc)
     {
-        $this->dc = $dc;
+        return new self(
+            $dc->getRouter(),
+            $dc->getHandlerRegistry(),
+            $dc->getViewRegistry()
+        );
     }
 
     public function processRequest(Http\Contract\IServerRequest $request)
     {
-        $route = $this->dc->getRouter()->route($request->getUri()->getPath());
-        $handler = $this->dc->getHandlerRegistry()->get($route->entry());
-        $response = $handler->handle($request->getMethod(), $this->makeHandlerRequest($request, $route->arguments()));
-        $view = $this->dc->getViewRegistry()->get($route->entry());
+        $route = $this->router->route($request->getUri()->getPath());
+        $handler = $this->handler_registry->getHandler($route->entry());
+        $response = $handler->handle($request->withJoinedQueryParams($route->arguments()));
+        $view = $this->view_registry->getView($route->entry());
 
         return $view->present($request->getMethod(), $response);
-    }
-
-    protected function makeHandlerRequest(Http\Contract\IServerRequest $request, array $arguments)
-    {
-        return new Handler\Request($request, $arguments);
     }
 }

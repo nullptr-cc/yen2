@@ -12,13 +12,34 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
     use \YenMock\MockServerRequest;
     use \YenMock\MockHttpResponse;
     use \YenMock\MockRegistry;
+    use \YenMock\MockHandlerRegistry;
+    use \YenMock\MockViewRegistry;
+
+    public function testCreateFromDC()
+    {
+        $router = $this->mockRouter();
+        $hregistry = $this->mockHandlerRegistry();
+        $vregistry = $this->mockViewRegistry();
+
+        $dc = $this->mockDependencyContainer();
+        $dc->method('getRouter')
+           ->willReturn($router);
+        $dc->method('getHandlerRegistry')
+           ->willReturn($hregistry);
+        $dc->method('getViewRegistry')
+           ->willReturn($vregistry);
+
+        $fc = Core\FrontController::createFromDC($dc);
+
+        $this->assertInstanceOf(Core\FrontController::class, $fc);
+    }
 
     public function testProcessRequest()
     {
-        list($dc, $request) = $this->prepare();
+        $mocks = $this->prepare();
 
-        $fc = new Core\FrontController($dc);
-        $resp = $fc->processRequest($request);
+        $fc = new Core\FrontController($mocks->router, $mocks->handler_registry, $mocks->view_registry);
+        $resp = $fc->processRequest($mocks->request);
 
         $this->assertInstanceOf('\Yen\Http\Response', $resp);
         $this->assertEquals(200, $resp->getStatusCode());
@@ -34,11 +55,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
         $uri->method('getPath')
             ->willReturn('/test');
 
-        $request = $this->mockServerRequest();
-        $request->method('getMethod')
-                ->willReturn('GET');
+        $request = $this->mockServerRequest('GET');
         $request->method('getUri')
                 ->willReturn($uri);
+        $request->method('withJoinedQueryParams')
+                ->will($this->returnSelf());
 
         $router = $this->mockRouter();
         $router->method('route')
@@ -49,15 +70,14 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
                         ->getMock();
         $handler->method('handle')
                 ->with(
-                    $this->equalTo('GET'),
-                    $this->isInstanceOf('\Yen\Handler\Request')
+                    $this->isInstanceOf('\Yen\Http\Contract\IServerRequest')
                 )->willReturn(
                     new \Yen\Handler\Response\Ok()
                 );
 
-        $hregistry = $this->mockRegistry();
+        $hregistry = $this->mockHandlerRegistry();
         $hregistry->expects($this->once())
-                  ->method('get')
+                  ->method('getHandler')
                   ->with($this->equalTo('test'))
                   ->willReturn($handler);
 
@@ -72,20 +92,17 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
                  $this->mockHttpResponse(200, ['Content-Type' => 'text/plain'], 'ok')
              );
 
-        $vregistry = $this->mockRegistry();
+        $vregistry = $this->mockViewRegistry();
         $vregistry->expects($this->once())
-                  ->method('get')
+                  ->method('getView')
                   ->with($this->equalTo('test'))
                   ->willReturn($view);
 
-        $dc = $this->mockDependencyContainer();
-        $dc->method('getRouter')
-           ->willReturn($router);
-        $dc->method('getHandlerRegistry')
-           ->willReturn($hregistry);
-        $dc->method('getViewRegistry')
-           ->willReturn($vregistry);
-
-        return [$dc, $request];
+        return (object)[
+            'router' => $router,
+            'handler_registry' => $hregistry,
+            'view_registry' => $vregistry,
+            'request' => $request
+        ];
     }
 }
