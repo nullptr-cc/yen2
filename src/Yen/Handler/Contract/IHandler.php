@@ -2,7 +2,9 @@
 
 namespace Yen\Handler\Contract;
 
+use Yen\Http\Contract\IServerRequest;
+
 interface IHandler
 {
-    public function handle(\Yen\Http\Contract\IServerRequest $request);
+    public function handle(IServerRequest $request);
 }

@@ -2,9 +2,9 @@
 
 namespace Yen\Handler;
 
-use Yen\Util;
+use Yen\Util\CommonRegistry;
 
-class HandlerRegistry extends Util\FactoryRegistry implements Contract\IHandlerRegistry
+class HandlerRegistry extends CommonRegistry implements Contract\IHandlerRegistry
 {
     public function getHandler($name)
     {

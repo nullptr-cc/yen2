@@ -13,34 +13,59 @@ abstract class Handler implements Contract\IHandler
         $on_name = 'on' . $name;
 
         if (!method_exists($this, $on_name)) {
-            return new Response\ErrorInvalidMethod();
+            return $this->getErrorPresenter()->errorInvalidMethod();
         };
 
-        return $this->{$on_name}($request);
+        $this->beforeHandle($request);
+        $response = $this->{$on_name}($request);
+        $this->afterHandle($request, $response);
+
+        return $response;
     }
 
-    protected function ok($data)
+    abstract protected function getErrorPresenter();
+
+    abstract protected function getPresenter();
+
+    protected function beforeHandle(Http\Contract\IServerRequest $request)
     {
-        return new Response\Ok($data);
     }
 
-    protected function invalidParams($data)
+    protected function afterHandle(Http\Contract\IServerRequest $request, Http\Contract\IResponse $response)
     {
-        return new Response\ErrorInvalidParams($data);
     }
 
-    protected function forbidden($data)
+    protected function ok(...$args)
     {
-        return new Response\ErrorForbidden($data);
+        return $this->getPresenter()->present(...$args);
     }
 
-    protected function notFound($data)
+    protected function error(...$args)
     {
-        return new Response\ErrorNotFound($data);
+        return $this->getErrorPresenter()->errorInternal(...$args);
     }
 
-    protected function error($data)
+    protected function notFound(...$args)
     {
-        return new Response\ErrorInternal($data);
+        return $this->getErrorPresenter()->errorNotFound(...$args);
+    }
+
+    protected function badParams(...$args)
+    {
+        return $this->getErrorPresenter()->errorInvalidParams(...$args);
+    }
+
+    protected function forbidden(...$args)
+    {
+        return $this->getErrorPresenter()->errorForbidden(...$args);
+    }
+
+    protected function redirect(Http\Contract\IUri $url, $persistent = false)
+    {
+        return new Http\Response(
+            $persistent ? 301 : 302,
+            ['Location' => $url],
+            ''
+        );
     }
 }
