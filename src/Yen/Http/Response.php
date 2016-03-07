@@ -29,4 +29,9 @@ class Response implements Contract\IResponse
     {
         return $this->body;
     }
+
+    public function withBody($body)
+    {
+        return new self($this->code, $this->headers, $body);
+    }
 }

@@ -7,4 +7,6 @@ interface IResponse
     public function getStatusCode();
     public function getBody();
     public function getHeaders();
+
+    public function withBody($body);
 }
