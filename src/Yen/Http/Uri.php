@@ -2,7 +2,7 @@
 
 namespace Yen\Http;
 
-class Uri implements Contract\IUri
+class Uri implements Contract\IUri, \JsonSerializable
 {
     protected $scheme;
     protected $userinfo;
@@ -103,6 +103,15 @@ class Uri implements Contract\IUri
         return new self(array_merge($this->parts(), ['query' => $query]));
     }
 
+    public function withJoinedQuery(array $args)
+    {
+        parse_str($this->query, $parsed);
+        $new_args = array_merge($parsed, $args);
+        $new_query = http_build_query($new_args);
+
+        return $this->withQuery($new_query);
+    }
+
     public function withFragment($fragment)
     {
         return new self(array_merge($this->parts(), ['fragment' => $fragment]));
@@ -118,6 +127,11 @@ class Uri implements Contract\IUri
         $this->fragment && $str[] = '#' . $this->fragment;
 
         return implode('', $str);
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->__toString();
     }
 
     private function parts()
