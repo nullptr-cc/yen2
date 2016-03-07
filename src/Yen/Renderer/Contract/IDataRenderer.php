@@ -2,8 +2,8 @@
 
 namespace Yen\Renderer\Contract;
 
-interface IRenderer
+interface IDataRenderer
 {
     public function mime();
-    public function render($data, ...$args);
+    public function render($data);
 }

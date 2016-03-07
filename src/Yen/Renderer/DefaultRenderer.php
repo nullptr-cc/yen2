@@ -2,18 +2,15 @@
 
 namespace Yen\Renderer;
 
-class DefaultRenderer implements Contract\IRenderer
+class DefaultRenderer implements Contract\IDataRenderer
 {
     public function mime()
     {
         return 'text/plain';
     }
 
-    public function render($data, ...$args)
+    public function render($data)
     {
-        return [
-            ['Content-Type' => $this->mime()],
-            print_r($data, true)
-        ];
+        return print_r($data, true);
     }
 }

@@ -2,18 +2,15 @@
 
 namespace Yen\Renderer;
 
-class JsonRenderer implements Contract\IRenderer
+class JsonRenderer implements Contract\IDataRenderer
 {
     public function mime()
     {
         return 'application/json';
     }
 
-    public function render($data, ...$args)
+    public function render($data)
     {
-        return [
-            ['Content-Type' => $this->mime()],
-            json_encode($data)
-        ];
+        return json_encode($data);
     }
 }

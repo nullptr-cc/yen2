@@ -2,15 +2,30 @@
 
 namespace Yen\Renderer;
 
-class TemplateRenderer implements Contract\IRenderer
+use Yen\Settings\Contract\ISettings;
+use Yen\Util\Contract\IPluginRegistry;
+
+class TemplateRenderer implements Contract\ITemplateRenderer
 {
     protected $tpl_dir;
     protected $tpl_ext;
+    protected $plugins;
 
-    public function __construct($tpl_dir, $tpl_ext = '.tpl')
+    public function __construct(ISettings $settings, IPluginRegistry $plugins = null)
     {
-        $this->tpl_dir = $tpl_dir;
-        $this->tpl_ext = $tpl_ext;
+        $this->tpl_dir = $settings->get('path');
+        $this->tpl_ext = $settings->lookup('ext', '.tpl');
+        $this->plugins = $plugins;
+    }
+
+    public function __call($method, $args)
+    {
+        if ($this->plugins === null) {
+            throw new \LogicException('Plugin call is unallowable: no plugin registry');
+        };
+
+        $plugin = $this->plugins->getPlugin($method);
+        return $plugin(...$args);
     }
 
     public function mime()
@@ -18,36 +33,17 @@ class TemplateRenderer implements Contract\IRenderer
         return 'text/plain';
     }
 
-    public function render($data, ...$args)
+    public function render($template, $data)
     {
-        if (!isset($args[0])) {
-            throw new \InvalidArgumentException('Missed start template');
-        };
-
-        $start_tpl = $args[0];
-        $layout = isset($args[1]) ? $args[1] : null;
-
-        $headers = ['Content-Type' => $this->mime()];
-
-        $body = $this->fetch($data, $start_tpl);
-        if ($layout) {
-            $body = $this->fetch(['main_content' => $body], $layout);
-        };
-
-        return [$headers, $body];
+        return $this->fetch($this->resolveTplPath($template), $data);
     }
 
     protected function fetch()
     {
-        extract(func_get_arg(0));
+        extract(func_get_arg(1));
         ob_start();
-        include $this->resolveTplPath(func_get_arg(1));
+        include func_get_arg(0);
         return ob_get_clean();
-    }
-
-    protected function partial($tpl, array $args)
-    {
-        return $this->fetch($args, $tpl);
     }
 
     protected function resolveTplPath($tpl)
