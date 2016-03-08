@@ -94,7 +94,7 @@ class Session implements Contract\ISession
     public function getStorage($prefix)
     {
         if ($prefix == '__inner') {
-            throw new \LogixException('Access denied to inner session storage');
+            throw new \LogicException('Access denied to inner session storage');
         };
 
         return $this->storage($prefix);
