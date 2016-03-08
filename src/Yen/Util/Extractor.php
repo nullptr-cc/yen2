@@ -4,10 +4,6 @@ namespace Yen\Util;
 
 class Extractor
 {
-    final private function __construct()
-    {
-    }
-
     protected static function extract(array $data, $key, $default)
     {
         if (array_key_exists($key, $data)) {
