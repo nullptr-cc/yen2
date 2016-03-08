@@ -2,14 +2,15 @@
 
 namespace YenTest\Handler;
 
-use Yen\Handler;
+use Yen\Util\FormatClassResolver;
+use Yen\Handler\HandlerRegistry;
 
 class HandlerRegistryTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetHandler()
     {
-        $factory = new Handler\HandlerFactory('\\YenMock\\Handler\\%sHandler');
-        $registry = new Handler\HandlerRegistry($factory);
+        $resolver = new FormatClassResolver('\\YenMock\\Handler\\%sHandler');
+        $registry = new HandlerRegistry($resolver);
 
         $handler = $registry->getHandler('custom');
 

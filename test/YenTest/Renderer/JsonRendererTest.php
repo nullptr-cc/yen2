@@ -18,7 +18,7 @@ class JsonRendererTest extends \PHPUnit_Framework_TestCase
     public function testRender($data, $expect)
     {
         $renderer = new JsonRenderer();
-        $this->assertEquals([['Content-Type' => 'application/json'], $expect], $renderer->render($data));
+        $this->assertEquals($expect, $renderer->render($data));
     }
 
     public function dataRender()

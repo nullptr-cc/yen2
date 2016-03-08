@@ -3,12 +3,18 @@
 namespace YenTest\Handler;
 
 use Yen\Handler;
+use Yen\Http\Response;
+use Yen\Http\Uri;
+use Yen\Presenter\Contract\IPresenter;
+use Yen\Presenter\Contract\IErrorPresenter;
 use YenMock\Handler\CustomHandler;
 use YenMock\Handler\RevealingHandler;
+use YenMock\Handler\RedirectHandler;
 
 class HandlerTest extends \PHPUnit_Framework_TestCase
 {
     use \YenMock\MockServerRequest;
+    use \YenMock\MockHttpResponse;
 
     public function testHandle()
     {
@@ -16,40 +22,93 @@ class HandlerTest extends \PHPUnit_Framework_TestCase
         $handler = new CustomHandler();
 
         $hr = $handler->handle($request);
-        $this->assertInstanceOf('\Yen\Handler\Response\Ok', $hr);
+
+        $this->assertInstanceOf(Response::class, $hr);
+        $this->assertEquals(200, $hr->getStatusCode());
     }
 
     public function testHandleInvalidMethod()
     {
-        $request = $this->mockServerRequest('POST');
-        $handler = new CustomHandler();
+        $response = $this->mockHttpResponse(405);
 
-        $hr = $handler->handle($request);
-        $this->assertInstanceOf('\Yen\Handler\Response\ErrorInvalidMethod', $hr);
+        $presenter = $this->getMockForAbstractClass(IErrorPresenter::class);
+        $presenter
+            ->expects($this->once())
+            ->method('errorInvalidMethod')
+            ->willReturn($response);
+
+        $handler = $this->getMockForAbstractClass(Handler\Handler::class);
+        $handler->expects($this->once())
+                ->method('getErrorPresenter')
+                ->willReturn($presenter);
+
+        $request = $this->mockServerRequest('POST');
+
+        $resp = $handler->handle($request);
+
+        $this->assertInstanceOf(Response::class, $resp);
+        $this->assertEquals(405, $resp->getStatusCode());
     }
 
     public function testShortcuts()
     {
-        $handler = new RevealingHandler();
+        $presenter = $this->prophesize(IPresenter::class);
+        $presenter
+            ->present('data-ok')
+            ->shouldBeCalled()
+            ->willReturn('response-ok');
+
+        $error_presenter = $this->prophesize(IErrorPresenter::class);
+        $error_presenter
+            ->errorInternal('data-internal-error')
+            ->shouldBeCalled()
+            ->willReturn('response-internal-error');
+        $error_presenter
+            ->errorInvalidParams('data-invalid-params')
+            ->shouldBeCalled()
+            ->willReturn('response-invalid-params');
+        $error_presenter
+            ->errorForbidden('data-forbidden')
+            ->shouldBeCalled()
+            ->willReturn('response-forbidden');
+        $error_presenter
+            ->errorNotFound('data-not-found')
+            ->shouldBeCalled()
+            ->willReturn('response-not-found');
+
+        $handler = new RevealingHandler($presenter->reveal(), $error_presenter->reveal());
 
         $resp = $handler->ok('data-ok');
-        $this->assertInstanceOf('\Yen\Handler\Response\Ok', $resp);
-        $this->assertEquals('data-ok', $resp->data());
+        $this->assertEquals('response-ok', $resp);
 
-        $resp = $handler->invalidParams('data-invalid-params');
-        $this->assertInstanceOf('\Yen\Handler\Response\ErrorInvalidParams', $resp);
-        $this->assertEquals('data-invalid-params', $resp->data());
+        $resp = $handler->error('data-internal-error');
+        $this->assertEquals('response-internal-error', $resp);
+
+        $resp = $handler->badParams('data-invalid-params');
+        $this->assertEquals('response-invalid-params', $resp);
 
         $resp = $handler->forbidden('data-forbidden');
-        $this->assertInstanceOf('\Yen\Handler\Response\ErrorForbidden', $resp);
-        $this->assertEquals('data-forbidden', $resp->data());
+        $this->assertEquals('response-forbidden', $resp);
 
         $resp = $handler->notFound('data-not-found');
-        $this->assertInstanceOf('\Yen\Handler\Response\ErrorNotFound', $resp);
-        $this->assertEquals('data-not-found', $resp->data());
+        $this->assertEquals('response-not-found', $resp);
+    }
 
-        $resp = $handler->error('data-error');
-        $this->assertInstanceOf('\Yen\Handler\Response\ErrorInternal', $resp);
-        $this->assertEquals('data-error', $resp->data());
+    public function testRedirect()
+    {
+        $handler = new RedirectHandler();
+        $uri = Uri::createFromString($url = 'https://images.google.com/search?q=sunrise');
+
+        $resp = $handler->redirect($uri);
+
+        $this->assertInstanceOf(Response::class, $resp);
+        $this->assertEquals(302, $resp->getStatusCode());
+        $this->assertEquals(['Location' => $url], $resp->getHeaders());
+
+        $resp = $handler->redirect($uri, true);
+
+        $this->assertInstanceOf(Response::class, $resp);
+        $this->assertEquals(301, $resp->getStatusCode());
+        $this->assertEquals(['Location' => $url], $resp->getHeaders());
     }
 }

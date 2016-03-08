@@ -4,28 +4,47 @@ namespace YenMock\Handler;
 
 class RevealingHandler extends \Yen\Handler\Handler
 {
-    public function ok($data)
+    protected $presenter;
+    protected $error_presenter;
+
+    public function __construct($presenter, $error_presenter)
     {
-        return parent::ok($data);
+        $this->presenter = $presenter;
+        $this->error_presenter = $error_presenter;
     }
 
-    public function invalidParams($data)
+    public function ok(...$args)
     {
-        return parent::invalidParams($data);
+        return parent::ok(...$args);
     }
 
-    public function forbidden($data)
+    public function badParams(...$args)
     {
-        return parent::forbidden($data);
+        return parent::badParams(...$args);
     }
 
-    public function notFound($data)
+    public function forbidden(...$args)
     {
-        return parent::notFound($data);
+        return parent::forbidden(...$args);
     }
 
-    public function error($data)
+    public function notFound(...$args)
     {
-        return parent::error($data);
+        return parent::notFound(...$args);
+    }
+
+    public function error(...$args)
+    {
+        return parent::error(...$args);
+    }
+
+    protected function getPresenter()
+    {
+        return $this->presenter;
+    }
+
+    protected function getErrorPresenter()
+    {
+        return $this->error_presenter;
     }
 }

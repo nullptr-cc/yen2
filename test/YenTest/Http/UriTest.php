@@ -202,4 +202,26 @@ class UriTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $new_uri->getFragment());
         $this->assertEquals('http://testing.net/index.html#test', $new_uri->__toString());
     }
+
+    public function testWithJoinedQUery()
+    {
+        $uri = Uri::createFromString('http://testing.net/index.html?foo=bar&a=12');
+        $new_uri = $uri->withJoinedQuery(['baz'=> 'foo']);
+        $this->assertInstanceOf(Uri::class, $new_uri);
+        $this->assertEquals('http', $new_uri->getScheme());
+        $this->assertNull($new_uri->getUserinfo());
+        $this->assertEquals('testing.net', $new_uri->getHost());
+        $this->assertNull($new_uri->getPort());
+        $this->assertEquals('/index.html', $new_uri->getPath());
+        $this->assertEquals('foo=bar&a=12&baz=foo', $new_uri->getQuery());
+        $this->assertNull($new_uri->getFragment());
+        $this->assertEquals('http://testing.net/index.html?foo=bar&a=12&baz=foo', $new_uri->__toString());
+    }
+
+    public function testJsonSerialize()
+    {
+        $uri = Uri::createFromString($url = 'http://testing.net/index.html?foo=bar&a=12');
+        $json = json_encode(['uri' => $uri]);
+        $this->assertEquals('{"uri":"http:\/\/testing.net\/index.html?foo=bar&a=12"}', $json);
+    }
 }

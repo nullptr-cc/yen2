@@ -3,12 +3,17 @@
 namespace YenTest\Renderer;
 
 use Yen\Renderer\TemplateRenderer;
+use Yen\Util\Contract\IPluginRegistry;
 
 class TemplateRendererTest extends \PHPUnit_Framework_TestCase
 {
+    use \YenMock\MockSettings;
+
     public function testMime()
     {
-        $renderer = new TemplateRenderer(null);
+        $settings = $this->mockSettings();
+
+        $renderer = new TemplateRenderer($settings);
         $this->assertEquals('text/plain', $renderer->mime());
     }
 
@@ -20,38 +25,52 @@ class TemplateRendererTest extends \PHPUnit_Framework_TestCase
         \MicroVFS\StreamWrapper::unregister('vfs');
         \MicroVFS\StreamWrapper::register('vfs', $container);
 
-        $renderer = new TemplateRenderer('vfs://tpl');
+        $settings = $this->mockSettings(['path' => 'vfs://tpl'], ['ext' => ['.tpl', '.tpl']]);
 
-        list($headers, $body) = $renderer->render(['foo' => 'bar'], 'test', 'layout');
-        $this->assertEquals(['Content-Type' => 'text/plain'], $headers);
-        $this->assertEquals('head -- content: foo = bar -- tail', $body);
+        $renderer = new TemplateRenderer($settings);
 
-        list($headers, $body) = $renderer->render(['foo' => 'baz'], 'test');
-        $this->assertEquals(['Content-Type' => 'text/plain'], $headers);
+        $body = $renderer->render('test', ['foo' => 'baz']);
         $this->assertEquals('content: foo = baz', $body);
+
+        $layout = $renderer->render('layout', ['main_content' => $body]);
+        $this->assertEquals('head -- content: foo = baz -- tail', $layout);
     }
 
     public function testPartial()
     {
         $container = new \MicroVFS\Container();
-        $container->set('tpl/test.tpl', 'content: foo = <?= $this->partial("foo", ["x" => 5]) ?>');
+        $container->set('tpl/test.tpl', 'content: foo = <?= $this->render("foo", ["x" => 5]) ?>');
         $container->set('tpl/foo.tpl', '"x: <?= $x ?>"');
         \MicroVFS\StreamWrapper::unregister('vfs');
         \MicroVFS\StreamWrapper::register('vfs', $container);
 
-        $renderer = new TemplateRenderer('vfs://tpl');
-        list($headers, $body) = $renderer->render([], 'test');
-        $this->assertEquals(['Content-Type' => 'text/plain'], $headers);
+        $settings = $this->mockSettings(['path' => 'vfs://tpl'], ['ext' => ['.tpl', '.tpl']]);
+
+        $renderer = new TemplateRenderer($settings);
+        $body = $renderer->render('test', []);
         $this->assertEquals('content: foo = "x: 5"', $body);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Missed start template
-     */
-    public function testRenderMissedTemplate()
+    public function testPluginCall()
     {
-        $renderer = new TemplateRenderer(null);
-        $renderer->render([]);
+        $plugins = $this->prophesize(IPluginRegistry::class);
+        $plugins
+            ->getPlugin('escape')
+            ->shouldBeCalled()
+            ->willReturn('htmlspecialchars');
+
+        $renderer = new TemplateRenderer($this->mockSettings(), $plugins->reveal());
+        $escaped = $renderer->escape('<b>Foo</b>');
+        $this->assertEquals('&lt;b&gt;Foo&lt;/b&gt;', $escaped);
+    }
+
+    public function testUnallowablePluginCallException()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Plugin call is unallowable: no plugin registry');
+
+        $renderer = new TemplateRenderer($this->mockSettings());
+
+        $renderer->escape();
     }
 }

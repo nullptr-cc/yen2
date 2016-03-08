@@ -18,7 +18,7 @@ class DefaultRendererTest extends \PHPUnit_Framework_TestCase
     public function testRender($data, $expect)
     {
         $renderer = new DefaultRenderer();
-        $this->assertEquals([['Content-Type' => 'text/plain'], $expect], $renderer->render($data));
+        $this->assertEquals($expect, $renderer->render($data));
     }
 
     public function dataRender()
