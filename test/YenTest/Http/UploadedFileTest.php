@@ -111,6 +111,9 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $ufile->moveTo('vfs://target/test.txt');
     }
 
+    /**
+     * @requires extension runkit
+     */
     public function testMoveWithFuncMock()
     {
         $container = new \MicroVFS\Container();
@@ -119,15 +122,16 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         \MicroVFS\StreamWrapper::unregister('vfs');
         \MicroVFS\StreamWrapper::register('vfs', $container);
 
+        $yarn = new \Yarn\XUnit\Functional($this);
+        $move_uf = $yarn->ravel('move_uploaded_file');
+        $move_uf->with('vfs://tmp/xxxxx.tmp', 'vfs://target/test.txt')
+                ->expectsOnce()
+                ->willReturn(true);
+
         $ufile = new Http\UploadedFile(UPLOAD_ERR_OK, 9, 'test.txt', 'text/plain', 'vfs://tmp/xxxxx.tmp');
-
-        \YenMock\mufTest(function ($src, $dst) {
-            $this->assertEquals('vfs://tmp/xxxxx.tmp', $src);
-            $this->assertEquals('vfs://target/test.txt', $dst);
-            return true;
-        });
-
         $moved = $ufile->moveTo('vfs://target/test.txt');
         $this->assertTrue($moved);
+
+        $yarn->unravel();
     }
 }
