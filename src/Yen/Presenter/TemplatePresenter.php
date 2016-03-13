@@ -3,23 +3,21 @@
 namespace Yen\Presenter;
 
 use Yen\Renderer\Contract\ITemplateRenderer;
-use Yen\Presenter\Contract\IComponentRegistry;
 
 class TemplatePresenter implements Contract\IPresenter, Contract\IErrorPresenter
 {
     protected $renderer;
-    protected $components;
 
-    public function __construct(ITemplateRenderer $renderer, IComponentRegistry $components)
+    public function __construct(ITemplateRenderer $renderer)
     {
         $this->renderer = $renderer;
-        $this->components = $components;
     }
 
     public function present(...$args)
     {
-        $cname = array_shift($args);
-        $content = $this->render($cname, $args);
+        $template = array_shift($args);
+        $params = array_shift($args);
+        $content = $this->render($template, is_null($params) ? [] : $params);
 
         return $this->response(200, $content);
     }
@@ -49,10 +47,9 @@ class TemplatePresenter implements Contract\IPresenter, Contract\IErrorPresenter
         return $this->response(405);
     }
 
-    protected function render($cname, array $args)
+    protected function render($template, array $params)
     {
-        $component = $this->components->getComponent($cname);
-        return $component(...$args);
+        return $this->renderer->render($template, $params);
     }
 
     protected function response($code, $content = '')

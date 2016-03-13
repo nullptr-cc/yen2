@@ -3,7 +3,6 @@
 namespace YenTest\Presenter;
 
 use Yen\Presenter\TemplatePresenter;
-use Yen\Presenter\Contract\IComponentRegistry;
 use Yen\Renderer\Contract\ITemplateRenderer;
 use Yen\Http\Contract\IResponse;
 
@@ -12,23 +11,21 @@ class TemplatePresenterTest extends \PHPUnit_Framework_TestCase
     public function testPresent()
     {
         $renderer = $this->mockRenderer();
-        $components = $this->mockComponents();
 
-        $presenter = new TemplatePresenter($renderer, $components);
-        $response = $presenter->present('Foo', ['foo', 'bar']);
+        $presenter = new TemplatePresenter($renderer);
+        $response = $presenter->present('foo', ['foo' => 'bar']);
 
         $this->assertInstanceOf(IResponse::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals(['Content-Type' => 'test/foo'], $response->getHeaders());
-        $this->assertEquals('foobar', $response->getBody());
+        $this->assertEquals('foo:bar', $response->getBody());
     }
 
     public function testErrorInternal()
     {
         $renderer = $this->mockRenderer();
-        $components = $this->mockComponents();
 
-        $presenter = new TemplatePresenter($renderer, $components);
+        $presenter = new TemplatePresenter($renderer);
         $response = $presenter->errorInternal();
 
         $this->assertInstanceOf(IResponse::class, $response);
@@ -40,9 +37,8 @@ class TemplatePresenterTest extends \PHPUnit_Framework_TestCase
     public function testErrorNotFound()
     {
         $renderer = $this->mockRenderer();
-        $components = $this->mockComponents();
 
-        $presenter = new TemplatePresenter($renderer, $components);
+        $presenter = new TemplatePresenter($renderer);
         $response = $presenter->errorNotFound();
 
         $this->assertInstanceOf(IResponse::class, $response);
@@ -54,9 +50,8 @@ class TemplatePresenterTest extends \PHPUnit_Framework_TestCase
     public function testErrorForbidden()
     {
         $renderer = $this->mockRenderer();
-        $components = $this->mockComponents();
 
-        $presenter = new TemplatePresenter($renderer, $components);
+        $presenter = new TemplatePresenter($renderer);
         $response = $presenter->errorForbidden();
 
         $this->assertInstanceOf(IResponse::class, $response);
@@ -68,9 +63,8 @@ class TemplatePresenterTest extends \PHPUnit_Framework_TestCase
     public function testErrorInvalidParams()
     {
         $renderer = $this->mockRenderer();
-        $components = $this->mockComponents();
 
-        $presenter = new TemplatePresenter($renderer, $components);
+        $presenter = new TemplatePresenter($renderer);
         $response = $presenter->errorInvalidParams();
 
         $this->assertInstanceOf(IResponse::class, $response);
@@ -82,9 +76,8 @@ class TemplatePresenterTest extends \PHPUnit_Framework_TestCase
     public function testErrorInvalidMethod()
     {
         $renderer = $this->mockRenderer();
-        $components = $this->mockComponents();
 
-        $presenter = new TemplatePresenter($renderer, $components);
+        $presenter = new TemplatePresenter($renderer);
         $response = $presenter->errorInvalidMethod();
 
         $this->assertInstanceOf(IResponse::class, $response);
@@ -98,16 +91,9 @@ class TemplatePresenterTest extends \PHPUnit_Framework_TestCase
         $renderer = $this->prophesize(ITemplateRenderer::class);
         $renderer->mime()
                  ->willReturn('test/foo');
+        $renderer->render('foo', ['foo' => 'bar'])
+                 ->willReturn('foo:bar');
 
         return $renderer->reveal();
-    }
-
-    protected function mockComponents()
-    {
-        $components = $this->prophesize(IComponentRegistry::class);
-        $components->getComponent('Foo')
-                   ->willReturn('implode');
-
-        return $components->reveal();
     }
 }
