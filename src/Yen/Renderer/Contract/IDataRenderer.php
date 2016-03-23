@@ -4,6 +4,8 @@ namespace Yen\Renderer\Contract;
 
 interface IDataRenderer
 {
-    public function mime();
+    /**
+     * @return MimedDocument
+     */
     public function render($data);
 }

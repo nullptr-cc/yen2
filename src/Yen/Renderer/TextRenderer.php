@@ -4,10 +4,10 @@ namespace Yen\Renderer;
 
 use Yen\Renderer\Contract\IDataRenderer;
 
-class JsonRenderer implements IDataRenderer
+class TextRenderer implements IDataRenderer
 {
     public function render($data)
     {
-        return MimedDocument::createJson(json_encode($data));
+        return MimedDocument::createText(print_r($data, true));
     }
 }

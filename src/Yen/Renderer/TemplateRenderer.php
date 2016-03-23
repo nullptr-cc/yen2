@@ -4,8 +4,9 @@ namespace Yen\Renderer;
 
 use Yen\Settings\Contract\ISettings;
 use Yen\Util\Contract\IPluginRegistry;
+use Yen\Renderer\Contract\ITemplateRenderer;
 
-class TemplateRenderer implements Contract\ITemplateRenderer
+class TemplateRenderer implements ITemplateRenderer
 {
     protected $tpl_dir;
     protected $tpl_ext;
@@ -28,14 +29,10 @@ class TemplateRenderer implements Contract\ITemplateRenderer
         return $plugin(...$args);
     }
 
-    public function mime()
-    {
-        return 'text/plain';
-    }
-
     public function render($template, $data)
     {
-        return $this->fetch($this->resolveTplPath($template), $data);
+        $content = $this->fetch($this->resolveTplPath($template), $data);
+        return $this->createDocument($content);
     }
 
     protected function fetch()
@@ -49,5 +46,10 @@ class TemplateRenderer implements Contract\ITemplateRenderer
     protected function resolveTplPath($tpl)
     {
         return sprintf('%s/%s%s', $this->tpl_dir, $tpl, $this->tpl_ext);
+    }
+
+    protected function createDocument($content)
+    {
+        return MimedDocument::createText($content);
     }
 }
