@@ -18,6 +18,11 @@ class CommonRegistry
         return $this->lazy($name, [$this, 'make']);
     }
 
+    protected function has($name)
+    {
+        return $this->resolver->resolve($name) != '';
+    }
+
     protected function make($name)
     {
         $classname = $this->resolver->resolve($name);
@@ -35,6 +40,6 @@ class CommonRegistry
 
     protected function createInvalidNameException($name)
     {
-        return new \LogicException('Unknown ' . $name);
+        return new \OutOfBoundsException('Unknown ' . $name);
     }
 }
