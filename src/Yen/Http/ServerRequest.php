@@ -114,6 +114,20 @@ class ServerRequest implements Contract\IServerRequest
         return is_array($this->headers[$name]) ? implode(',', $this->headers[$name]) : $this->headers[$name];
     }
 
+    public function withMethod($method)
+    {
+        $env = $this->env;
+        $env['REQUEST_METHOD'] = $method;
+
+        return new self(
+            $env,
+            $this->query,
+            $this->body,
+            $this->cookies,
+            $this->files
+        );
+    }
+
     public function withQueryParams(array $params)
     {
         return new self(

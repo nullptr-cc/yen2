@@ -2,7 +2,7 @@
 
 namespace Yen\Http\Contract;
 
-interface IServerRequest
+interface IServerRequest extends IRequest
 {
     public function getMethod();
     public function getRequestTarget();
