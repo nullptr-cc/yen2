@@ -1,6 +1,6 @@
 <?php
 
-namespace Yen\Web\Session\Contract;
+namespace Yen\Session\Contract;
 
 use Yen\Http\Contract\IServerRequest;
 

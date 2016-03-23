@@ -1,6 +1,6 @@
 <?php
 
-namespace Yen\Web\Session;
+namespace Yen\Session;
 
 class SessionStorage
 {
