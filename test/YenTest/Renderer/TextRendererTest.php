@@ -2,23 +2,19 @@
 
 namespace YenTest\Renderer;
 
-use Yen\Renderer\DefaultRenderer;
+use Yen\Renderer\TextRenderer;
 
-class DefaultRendererTest extends \PHPUnit_Framework_TestCase
+class TextRendererTest extends \PHPUnit_Framework_TestCase
 {
-    public function testMime()
-    {
-        $renderer = new DefaultRenderer();
-        $this->assertEquals('text/plain', $renderer->mime());
-    }
-
     /**
      * @dataProvider dataRender
      */
     public function testRender($data, $expect)
     {
-        $renderer = new DefaultRenderer();
-        $this->assertEquals($expect, $renderer->render($data));
+        $renderer = new TextRenderer();
+        $doc = $renderer->render($data);
+        $this->assertEquals('text/plain', $doc->mime());
+        $this->assertEquals($expect, $doc->content());
     }
 
     public function dataRender()

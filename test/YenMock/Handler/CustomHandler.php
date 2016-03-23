@@ -2,18 +2,20 @@
 
 namespace YenMock\Handler;
 
-class CustomHandler extends \Yen\Handler\Handler
+use Yen\Handler\Contract\IHandler;
+use Yen\Http\Contract\IServerRequest;
+use Yen\Http\Contract\IRequest;
+use Yen\Http\Response;
+
+class CustomHandler implements IHandler
 {
-    protected function onGet($request)
+    public function getAllowedMethods()
     {
-        return new \Yen\Http\Response(200, [], '');
+        return [IRequest::METHOD_GET];
     }
 
-    protected function getPresenter()
+    public function handle(IServerRequest $request)
     {
-    }
-
-    protected function getErrorPresenter()
-    {
+        return new Response(200, [], 'ok');
     }
 }

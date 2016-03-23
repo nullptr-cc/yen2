@@ -1,9 +1,9 @@
 <?php
 
-namespace YenTest\Web\Session;
+namespace YenTest\Session;
 
-use Yen\Web\Session\Session;
-use Yen\Web\Session\SessionStorage;
+use Yen\Session\Session;
+use Yen\Session\SessionStorage;
 use Yen\Http\Contract\IServerRequest;
 
 /**

@@ -10,4 +10,9 @@ class DummyRegistry extends CommonRegistry
     {
         return parent::get($name);
     }
+
+    public function has($name)
+    {
+        return parent::has($name);
+    }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace YenTest\Web\Session;
+namespace YenTest\Session;
 
-use Yen\Web\Session\SessionStorage;
+use Yen\Session\SessionStorage;
 
 class SessionStorageTest extends \PHPUnit_Framework_TestCase
 {

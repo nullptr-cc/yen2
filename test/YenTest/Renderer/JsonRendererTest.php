@@ -6,19 +6,15 @@ use Yen\Renderer\JsonRenderer;
 
 class JsonRendererTest extends \PHPUnit_Framework_TestCase
 {
-    public function testMime()
-    {
-        $renderer = new JsonRenderer();
-        $this->assertEquals('application/json', $renderer->mime());
-    }
-
     /**
      * @dataProvider dataRender
      */
     public function testRender($data, $expect)
     {
         $renderer = new JsonRenderer();
-        $this->assertEquals($expect, $renderer->render($data));
+        $doc = $renderer->render($data);
+        $this->assertEquals('application/json', $doc->mime());
+        $this->assertEquals($expect, $doc->content());
     }
 
     public function dataRender()

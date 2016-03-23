@@ -9,14 +9,6 @@ class TemplateRendererTest extends \PHPUnit_Framework_TestCase
 {
     use \YenMock\MockSettings;
 
-    public function testMime()
-    {
-        $settings = $this->mockSettings();
-
-        $renderer = new TemplateRenderer($settings);
-        $this->assertEquals('text/plain', $renderer->mime());
-    }
-
     public function testRender()
     {
         $container = new \MicroVFS\Container();

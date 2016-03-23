@@ -21,7 +21,7 @@ class CommonRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidNameException()
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Unknown');
 
         $resolver = $this->prophesize(IClassResolver::class);
