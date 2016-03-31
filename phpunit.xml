@@ -12,5 +12,8 @@
         <testsuite name="http">
             <directory>test/YenTest/Http</directory>
         </testsuite>
+        <testsuite name="httpclient">
+            <directory>test/YenTest/HttpClient</directory>
+        </testsuite>
     </testsuites>
 </phpunit>
