@@ -2,17 +2,24 @@
 
 namespace Yen\Http;
 
-class Response implements Contract\IResponse
+use Yen\Http\Contract\IResponse;
+use Yen\Http\Contract\IMessage;
+
+class Response extends Message implements IResponse
 {
     protected $code;
-    protected $headers;
-    protected $body;
+    protected $reason;
 
-    public function __construct($code, $headers, $body)
-    {
+    public function __construct(
+        $code = IResponse::STATUS_OK,
+        array $headers = [],
+        $body = '',
+        $reason = '',
+        $version = IMessage::HTTP_VERSION_10
+    ) {
+        parent::__construct($version, $headers, $body);
         $this->code = $code;
-        $this->headers = $headers;
-        $this->body = $body;
+        $this->reason = $reason;
     }
 
     public function getStatusCode()
@@ -20,18 +27,16 @@ class Response implements Contract\IResponse
         return $this->code;
     }
 
-    public function getHeaders()
+    public function getReasonPhrase()
     {
-        return $this->headers;
+        return $this->reason;
     }
 
-    public function getBody()
+    public function withStatus($code, $reason = '')
     {
-        return $this->body;
-    }
-
-    public function withBody($body)
-    {
-        return new self($this->code, $this->headers, $body);
+        $clone = clone $this;
+        $clone->code = $code;
+        $clone->reason = $reason;
+        return $clone;
     }
 }

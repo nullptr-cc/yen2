@@ -11,7 +11,7 @@ class HandlerResponseHelpersTest extends \PHPUnit_Framework_TestCase
     public function testOk()
     {
         $handler = new HelpersHandler();
-        $request = (new ServerRequest())->withQueryParams(['r' => 'ok']);
+        $request = ServerRequest::createFromGlobals()->withQueryParams(['r' => 'ok']);
 
         $response = $handler->handle($request);
 
@@ -24,7 +24,7 @@ class HandlerResponseHelpersTest extends \PHPUnit_Framework_TestCase
     public function testBadRequest()
     {
         $handler = new HelpersHandler();
-        $request = (new ServerRequest())->withQueryParams(['r' => 'bad_request']);
+        $request = ServerRequest::createFromGlobals()->withQueryParams(['r' => 'bad_request']);
 
         $response = $handler->handle($request);
 
@@ -37,7 +37,7 @@ class HandlerResponseHelpersTest extends \PHPUnit_Framework_TestCase
     public function testForbidden()
     {
         $handler = new HelpersHandler();
-        $request = (new ServerRequest())->withQueryParams(['r' => 'forbidden']);
+        $request = ServerRequest::createFromGlobals()->withQueryParams(['r' => 'forbidden']);
 
         $response = $handler->handle($request);
 
@@ -50,7 +50,7 @@ class HandlerResponseHelpersTest extends \PHPUnit_Framework_TestCase
     public function testNotFound()
     {
         $handler = new HelpersHandler();
-        $request = (new ServerRequest())->withQueryParams(['r' => 'not_found']);
+        $request = ServerRequest::createFromGlobals()->withQueryParams(['r' => 'not_found']);
 
         $response = $handler->handle($request);
 
@@ -63,7 +63,7 @@ class HandlerResponseHelpersTest extends \PHPUnit_Framework_TestCase
     public function testError()
     {
         $handler = new HelpersHandler();
-        $request = (new ServerRequest())->withQueryParams(['r' => 'error']);
+        $request = ServerRequest::createFromGlobals()->withQueryParams(['r' => 'error']);
 
         $response = $handler->handle($request);
 
@@ -76,7 +76,7 @@ class HandlerResponseHelpersTest extends \PHPUnit_Framework_TestCase
     public function testRedirectPermanent()
     {
         $handler = new HelpersHandler();
-        $request = (new ServerRequest())->withQueryParams(['r' => 'redirect_perm']);
+        $request = ServerRequest::createFromGlobals()->withQueryParams(['r' => 'redirect_perm']);
 
         $response = $handler->handle($request);
 
@@ -89,7 +89,7 @@ class HandlerResponseHelpersTest extends \PHPUnit_Framework_TestCase
     public function testRedirectTemporary()
     {
         $handler = new HelpersHandler();
-        $request = (new ServerRequest())->withQueryParams(['r' => 'redirect_temp']);
+        $request = ServerRequest::createFromGlobals()->withQueryParams(['r' => 'redirect_temp']);
 
         $response = $handler->handle($request);
 

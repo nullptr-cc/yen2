@@ -57,7 +57,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
 
     protected function prepare()
     {
-        $request = new ServerRequest(['REQUEST_URI' => '/test', 'REQUEST_METHOD' => IRequest::METHOD_GET]);
+        $request = ServerRequest::createFromGlobals(['REQUEST_URI' => '/test', 'REQUEST_METHOD' => IRequest::METHOD_GET]);
         $route = new Route('custom', []);
         $handler = new CustomHandler();
 

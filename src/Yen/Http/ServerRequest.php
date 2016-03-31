@@ -2,38 +2,55 @@
 
 namespace Yen\Http;
 
-class ServerRequest implements Contract\IServerRequest
+use Yen\Http\Contract\IServerRequest;
+use Yen\Http\Contract\IMessage;
+use Yen\Http\Contract\IRequest;
+use Yen\Http\Contract\IUri;
+
+class ServerRequest extends Request implements IServerRequest
 {
     protected $env;
-    protected $method;
-    protected $target;
-    protected $headers;
-    protected $query;
-    protected $body;
+    protected $query_params;
+    protected $parsed_body;
     protected $cookies;
-    protected $files;
-    protected $uri;
+    protected $uploaded_files;
 
     public function __construct(
+        array $env,
+        array $query_params,
+        array $parsed_body,
+        array $cookies,
+        array $uploaded_files,
+        IUri $uri,
+        $method = IRequest::METHOD_GET,
+        $target = '',
+        array $headers = [],
+        $body = '',
+        $version = IMessage::HTTP_VERSION_10
+    ) {
+        parent::__construct($uri, $method, $target, $headers, $body, $version);
+        $this->env = $env;
+        $this->query_params = $query_params;
+        $this->parsed_body = $parsed_body;
+        $this->cookies = $cookies;
+        $this->uploaded_files = $uploaded_files;
+    }
+
+    public static function createFromGlobals(
         array $env = [],
         array $query = [],
         array $body = [],
         array $cookies = [],
         array $files = []
     ) {
-        $this->env = $env;
-        $this->method = isset($env['REQUEST_METHOD']) ? $env['REQUEST_METHOD'] : null;
-        $this->target = isset($env['REQUEST_URI']) ? $env['REQUEST_URI'] : '/';
-        $this->query = $query;
-        $this->body = $body;
-        $this->cookies = $cookies;
-        $this->files = $files;
+        $method = isset($env['REQUEST_METHOD']) ? $env['REQUEST_METHOD'] : IRequest::METHOD_GET;
+        $target = isset($env['REQUEST_URI']) ? $env['REQUEST_URI'] : '/';
 
-        $this->headers = [];
+        $headers = [];
         foreach ($env as $key => $value) {
             if (strpos($key, 'HTTP_') === 0) {
                 $nkey = strtolower(str_replace('_', '-', substr($key, 5)));
-                $this->headers[$nkey] = $value;
+                $headers[$nkey] = $value;
             };
         };
 
@@ -41,28 +58,34 @@ class ServerRequest implements Contract\IServerRequest
             'scheme' => isset($env['REQUEST_SCHEME']) ? $env['REQUEST_SCHEME'] : null,
             'host' => isset($env['HTTP_HOST']) ? $env['HTTP_HOST'] : null,
         ];
-        if (strpos($this->target, '?') !== false) {
-            list($p, $q) = explode('?', $this->target, 2);
+        if (strpos($target, '?') !== false) {
+            list($p, $q) = explode('?', $target, 2);
             $uri_args += ['path' => $p, 'query' => $q];
         } else {
-            $uri_args += ['path' => $this->target];
+            $uri_args += ['path' => $target];
         };
-        $this->uri = self::makeUri($uri_args);
-    }
+        $uri = new Uri($uri_args);
 
-    public function getMethod()
-    {
-        return $this->method;
-    }
+        $version = IMessage::HTTP_VERSION_10;
+        if (isset($env['SERVER_PROTOCOL'])) {
+            $version = substr($env['SERVER_PROTOCOL'], 5);
+        };
 
-    public function getRequestTarget()
-    {
-        return $this->target;
-    }
+        $uploaded_files = self::fillFiles($files);
 
-    public function getUri()
-    {
-        return $this->uri;
+        return new self(
+            $env,
+            $query,
+            $body,
+            $cookies,
+            $uploaded_files,
+            $uri,
+            $method,
+            $target,
+            $headers,
+            '', // TODO: stream from php://input
+            $version
+        );
     }
 
     public function getServerParams()
@@ -75,84 +98,54 @@ class ServerRequest implements Contract\IServerRequest
         return $this->cookies;
     }
 
+    public function withCookieParams(array $cookies)
+    {
+        $clone = clone $this;
+        $clone->cookies = $cookies;
+        return $clone;
+    }
+
     public function getQueryParams()
     {
-        return $this->query;
-    }
-
-    public function getUploadedFiles()
-    {
-        return $this->files;
-    }
-
-    public function getParsedBody()
-    {
-        return $this->body;
-    }
-
-    public function getHeaders()
-    {
-        return $this->headers;
-    }
-
-    public function hasHeader($name)
-    {
-        return array_key_exists($name, $this->headers);
-    }
-
-    public function getHeader($name)
-    {
-        return $this->hasHeader($name) ? $this->headers[$name] : null;
-    }
-
-    public function getHeaderLine($name)
-    {
-        if (!$this->hasHeader($name)) {
-            return '';
-        };
-
-        return is_array($this->headers[$name]) ? implode(',', $this->headers[$name]) : $this->headers[$name];
-    }
-
-    public function withMethod($method)
-    {
-        $env = $this->env;
-        $env['REQUEST_METHOD'] = $method;
-
-        return new self(
-            $env,
-            $this->query,
-            $this->body,
-            $this->cookies,
-            $this->files
-        );
+        return $this->query_params;
     }
 
     public function withQueryParams(array $params)
     {
-        return new self(
-            $this->env,
-            $params,
-            $this->body,
-            $this->cookies,
-            $this->files
-        );
+        $clone = clone $this;
+        $clone->query_params = $params;
+        return $clone;
     }
 
     public function withJoinedQueryParams(array $params)
     {
-        return new self(
-            $this->env,
-            array_merge($this->query, $params),
-            $this->body,
-            $this->cookies,
-            $this->files
-        );
+        $clone = clone $this;
+        $clone->query_params = array_merge($this->query_params, $params);
+        return $clone;
     }
 
-    protected static function makeUri(array $args)
+    public function getUploadedFiles()
     {
-        return new Uri($args);
+        return $this->uploaded_files;
+    }
+
+    public function withUploadedFiles(array $files)
+    {
+        $clone = clone $this;
+        $clone->uploaded_files = $files;
+        return $clone;
+    }
+
+    public function getParsedBody()
+    {
+        return $this->parsed_body;
+    }
+
+    public function withParsedBody($data)
+    {
+        $clone = clone $this;
+        $clone->parsed_body = $data;
+        return $clone;
     }
 
     public static function fillFiles(array $files)

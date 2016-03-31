@@ -2,7 +2,7 @@
 
 namespace Yen\Http\Contract;
 
-interface IResponse
+interface IResponse extends IMessage
 {
     const STATUS_OK = 200;
 
@@ -17,8 +17,6 @@ interface IResponse
     const STATUS_INTERNAL_ERROR = 500;
 
     public function getStatusCode();
-    public function getBody();
-    public function getHeaders();
-
-    public function withBody($body);
+    public function getReasonPhrase();
+    public function withStatus($code, $reason = '');
 }

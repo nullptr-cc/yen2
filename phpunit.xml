@@ -9,5 +9,8 @@
         <testsuite name="all">
             <directory>test/YenTest</directory>
         </testsuite>
+        <testsuite name="http">
+            <directory>test/YenTest/Http</directory>
+        </testsuite>
     </testsuites>
 </phpunit>

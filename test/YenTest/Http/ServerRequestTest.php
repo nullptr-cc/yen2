@@ -3,41 +3,53 @@
 namespace YenTest\Http;
 
 use Yen\Http;
+use Yen\Http\Contract\IRequest;
+use Yen\Http\Contract\IUri;
+use Yen\Http\Contract\IMessage;
+use Yen\Http\ServerRequest;
 
 class ServerRequestTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateSimple()
     {
-        $srequest = new Http\ServerRequest();
-        $this->assertNull($srequest->getMethod());
+        $srequest = Http\ServerRequest::createFromGlobals();
+        $this->assertEquals(IRequest::METHOD_GET, $srequest->getMethod());
         $this->assertEquals('/', $srequest->getRequestTarget());
-        $this->assertInstanceOf('\Yen\Http\Contract\IUri', $srequest->getUri());
+        $this->assertInstanceOf(IUri::class, $srequest->getUri());
         $this->assertEmpty($srequest->getServerParams());
         $this->assertEmpty($srequest->getCookieParams());
         $this->assertEmpty($srequest->getQueryParams());
         $this->assertEmpty($srequest->getUploadedFiles());
         $this->assertEmpty($srequest->getHeaders());
         $this->assertFalse($srequest->hasHeader('content-type'));
-        $this->assertNull($srequest->getHeader('content-type'));
-        $this->assertEquals('', $srequest->getHeaderLine('content-type'));
+        $this->assertEquals('', $srequest->getHeader('content-type'));
     }
 
     public function testCreateWithMethod()
     {
-        $srequest = new Http\ServerRequest(['REQUEST_METHOD' => 'GET']);
+        $srequest = Http\ServerRequest::createFromGlobals(['REQUEST_METHOD' => 'GET']);
         $this->assertEquals('GET', $srequest->getMethod());
 
-        $srequest = new Http\ServerRequest(['REQUEST_METHOD' => 'PATCH']);
+        $srequest = Http\ServerRequest::createFromGlobals(['REQUEST_METHOD' => 'PATCH']);
         $this->assertEquals('PATCH', $srequest->getMethod());
 
-        $srequest = new Http\ServerRequest(['REQUEST_method' => 'GET']);
-        $this->assertNull($srequest->getMethod());
+        $srequest = Http\ServerRequest::createFromGlobals(['REQUEST_method' => 'DELETE']);
+        $this->assertEquals('GET', $srequest->getMethod());
     }
 
     public function testCreateWithTarget()
     {
-        $srequest = new Http\ServerRequest(['REQUEST_URI' => '/test/index.html']);
+        $srequest = Http\ServerRequest::createFromGlobals(['REQUEST_URI' => '/test/index.html']);
         $this->assertEquals('/test/index.html', $srequest->getRequestTarget());
+    }
+
+    public function testCreateWithProtocolVersion()
+    {
+        $srequest = ServerRequest::createFromGlobals();
+        $this->assertEquals(IMessage::HTTP_VERSION_10, $srequest->getProtocolVersion());
+
+        $srequest = ServerRequest::createFromGlobals(['SERVER_PROTOCOL' => 'HTTP/1.1']);
+        $this->assertEquals(IMessage::HTTP_VERSION_11, $srequest->getProtocolVersion());
     }
 
     public function testCreateWithQueryBodyCookies()
@@ -45,7 +57,7 @@ class ServerRequestTest extends \PHPUnit_Framework_TestCase
         $query = ['foo' => 'bar', 'a' => 123, 'd' => false];
         $body = ['baz' => 'bat', 'b' => -5, 'c' => null];
         $cookies = ['sid' => '112233445566ffabcde', 'lang' => 'en'];
-        $srequest = new Http\ServerRequest([], $query, $body, $cookies);
+        $srequest = Http\ServerRequest::createFromGlobals([], $query, $body, $cookies);
         $this->assertEquals($query, $srequest->getQueryParams());
         $this->assertEquals($body, $srequest->getParsedBody());
         $this->assertEquals($cookies, $srequest->getCookieParams());
@@ -63,14 +75,11 @@ class ServerRequestTest extends \PHPUnit_Framework_TestCase
             'accept' => 'text/html,text/plain',
             'user-agent' => 'Mozilla/4.0'
         ];
-        $srequest = new Http\ServerRequest($env);
+        $srequest = Http\ServerRequest::createFromGlobals($env);
         $this->assertEquals($expect, $srequest->getHeaders());
         $this->assertEquals('test.net', $srequest->getHeader('host'));
         $this->assertEquals('text/html,text/plain', $srequest->getHeader('accept'));
         $this->assertEquals('Mozilla/4.0', $srequest->getHeader('user-agent'));
-        $this->assertEquals('test.net', $srequest->getHeaderLine('host'));
-        $this->assertEquals('text/html,text/plain', $srequest->getHeaderLine('accept'));
-        $this->assertEquals('Mozilla/4.0', $srequest->getHeaderLine('user-agent'));
     }
 
     public function testCreateUri()
@@ -80,7 +89,7 @@ class ServerRequestTest extends \PHPUnit_Framework_TestCase
             'HTTP_HOST' => 'test.net',
             'REQUEST_URI' => '/test/index.html?foo=bar'
         ];
-        $srequest = new Http\ServerRequest($env);
+        $srequest = Http\ServerRequest::createFromGlobals($env);
         $uri = $srequest->getUri();
         $this->assertInstanceOf('\Yen\Http\Contract\IUri', $uri);
         $this->assertEquals('http', $uri->getScheme());
@@ -165,12 +174,12 @@ class ServerRequestTest extends \PHPUnit_Framework_TestCase
 
     public function testWithQueryParams()
     {
-        $request = new Http\ServerRequest();
+        $request = Http\ServerRequest::createFromGlobals();
         $request = $request->withQueryParams(['foo' => 'bar']);
 
         $this->assertSame(['foo' => 'bar'], $request->getQueryParams());
 
-        $request = new Http\ServerRequest([], ['foo' => 'bar']);
+        $request = Http\ServerRequest::createFromGlobals([], ['foo' => 'bar']);
         $request = $request->withQueryParams(['bar' => 'baz']);
 
         $this->assertSame(['bar' => 'baz'], $request->getQueryParams());
@@ -178,14 +187,41 @@ class ServerRequestTest extends \PHPUnit_Framework_TestCase
 
     public function testWithJoinedQueryParams()
     {
-        $request = new Http\ServerRequest();
+        $request = Http\ServerRequest::createFromGlobals();
         $request = $request->withJoinedQueryParams(['foo' => 'bar']);
 
         $this->assertSame(['foo' => 'bar'], $request->getQueryParams());
 
-        $request = new Http\ServerRequest([], ['foo' => 'bar']);
+        $request = Http\ServerRequest::createFromGlobals([], ['foo' => 'bar']);
         $request = $request->withJoinedQueryParams(['bar' => 'baz']);
 
         $this->assertSame(['foo' => 'bar','bar' => 'baz'], $request->getQueryParams());
+    }
+
+    public function testWithCookieParams()
+    {
+        $srequest = ServerRequest::createFromGlobals();
+        $this->assertEmpty($srequest->getCookieParams());
+
+        $srequest = $srequest->withCookieParams(['foo' => 'bar']);
+        $this->assertEquals(['foo' => 'bar'], $srequest->getCookieParams());
+    }
+
+    public function testWithUploadedFiles()
+    {
+        $srequest = ServerRequest::createFromGlobals();
+        $this->assertEmpty($srequest->getUploadedFiles());
+
+        $srequest = $srequest->withUploadedFiles(['foo' => ['name' => 'bar.txt']]);
+        $this->assertEquals(['foo' => ['name' => 'bar.txt']], $srequest->getUploadedFiles());
+    }
+
+    public function testWithParsedBody()
+    {
+        $srequest = ServerRequest::createFromGlobals();
+        $this->assertEmpty($srequest->getParsedBody());
+
+        $srequest = $srequest->withParsedBody(['foo' => 'bar']);
+        $this->assertEquals(['foo' => 'bar'], $srequest->getParsedBody());
     }
 }
