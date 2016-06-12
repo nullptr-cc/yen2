@@ -2,8 +2,8 @@
 
 namespace YenTest\Util;
 
+use Yen\ClassResolver\Contract\IClassResolver;
 use Yen\Util\PluginRegistry;
-use Yen\Util\Contract\IClassResolver;
 
 class PluginRegistryTest extends \PHPUnit_Framework_TestCase
 {

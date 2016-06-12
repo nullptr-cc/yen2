@@ -2,7 +2,8 @@
 
 namespace YenTest\Util;
 
-use Yen\Util\Contract\IClassResolver;
+use Yen\ClassResolver\Contract\IClassResolver;
+use Yen\ClassResolver\ClassNotResolved;
 use YenMock\Util\DummyRegistry;
 
 class CommonRegistryTest extends \PHPUnit_Framework_TestCase
@@ -26,7 +27,7 @@ class CommonRegistryTest extends \PHPUnit_Framework_TestCase
 
         $resolver = $this->prophesize(IClassResolver::class);
         $resolver->resolve('foo')
-                 ->willReturn(false);
+                 ->willThrow(new ClassNotResolved('foo'));
 
         $registry = new DummyRegistry($resolver->reveal());
         $registry->get('foo');

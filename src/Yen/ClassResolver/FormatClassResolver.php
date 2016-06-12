@@ -1,16 +1,16 @@
 <?php
 
-namespace Yen\Util;
+namespace Yen\ClassResolver;
 
-class FormatClassResolver implements Contract\IClassResolver
+use Yen\ClassResolver\Contract\IClassResolver;
+
+class FormatClassResolver implements IClassResolver
 {
     protected $format;
-    protected $fallback;
 
-    public function __construct($format, $fallback = '')
+    public function __construct($format)
     {
         $this->format = $format;
-        $this->fallback = $fallback;
     }
 
     public function resolve($string)
@@ -21,7 +21,7 @@ class FormatClassResolver implements Contract\IClassResolver
         if (class_exists($classname)) {
             return $classname;
         } else {
-            return $this->fallback;
+            throw new ClassNotResolved($string);
         };
     }
 }

@@ -2,13 +2,16 @@
 
 namespace Yen\Util;
 
+use Yen\ClassResolver\Contract\IClassResolver;
+use Yen\ClassResolver\ClassNotResolved;
+
 class CommonRegistry
 {
     use LazyContainer;
 
     protected $resolver;
 
-    public function __construct(Contract\IClassResolver $resolver)
+    public function __construct(IClassResolver $resolver)
     {
         $this->resolver = $resolver;
     }
@@ -20,17 +23,22 @@ class CommonRegistry
 
     protected function has($name)
     {
-        return $this->resolver->resolve($name) != '';
+        try {
+            $this->resolver->resolve($name);
+            return true;
+        } catch (ClassNotResolved $ex) {
+            return false;
+        };
     }
 
     protected function make($name)
     {
-        $classname = $this->resolver->resolve($name);
-        if (!$classname) {
+        try {
+            $classname = $this->resolver->resolve($name);
+            return $this->createExistent($classname);
+        } catch (ClassNotResolved $ex) {
             throw $this->createInvalidNameException($name);
         };
-
-        return $this->createExistent($classname);
     }
 
     protected function createExistent($classname)

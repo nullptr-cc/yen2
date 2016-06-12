@@ -2,7 +2,7 @@
 
 namespace YenTest\Handler;
 
-use Yen\Util\FormatClassResolver;
+use Yen\ClassResolver\FormatClassResolver;
 use Yen\Handler\HandlerRegistry;
 use Yen\Handler\HandlerNotFoundException;
 
