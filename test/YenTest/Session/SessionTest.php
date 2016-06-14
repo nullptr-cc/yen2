@@ -6,29 +6,24 @@ use Yen\Session\Session;
 use Yen\Session\SessionStorage;
 use Yen\Http\Contract\IServerRequest;
 
-/**
- * @requires extension runkit
- */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
-    protected $yarn;
+    protected $defunc;
 
     public function setUp()
     {
-        $this->yarn = new \Yarn\XUnit\Functional($this);
+        $this->defunc = (new \Defunc\Builder())->in('Yen\Session');
     }
 
     public function tearDown()
     {
-        $this->yarn->unravel();
-        unset($this->yarn);
+        $this->defunc->clear();
     }
 
     public function testIsActive()
     {
-        $status = $this->yarn->ravel('session_status');
-        $status->expectsOnce()
-               ->willReturn(PHP_SESSION_ACTIVE);
+        $this->defunc->session_status()
+                     ->willReturn(PHP_SESSION_ACTIVE);
 
         $session = new Session();
 
@@ -37,12 +32,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testStartHappyPath()
     {
-        $status = $this->yarn->ravel('session_status');
-        $status->expectsOnce()
-               ->willReturn(PHP_SESSION_NONE);
-        $start = $this->yarn->ravel('session_start');
-        $start->expectsOnce()
-              ->willReturn(true);
+        $this->defunc->session_status()
+                     ->willReturn(PHP_SESSION_NONE);
+        $this->defunc->session_start()
+                     ->willReturn(true);
 
         $session = new Session();
 
@@ -54,9 +47,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Session already started');
 
-        $status = $this->yarn->ravel('session_status');
-        $status->expectsOnce()
-               ->willReturn(PHP_SESSION_ACTIVE);
+        $this->defunc->session_status()
+                     ->willReturn(PHP_SESSION_ACTIVE);
 
         $session = new Session();
         $session->start();
@@ -67,12 +59,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Can not start session');
 
-        $status = $this->yarn->ravel('session_status');
-        $status->expectsOnce()
-               ->willReturn(PHP_SESSION_NONE);
-        $start = $this->yarn->ravel('session_start');
-        $start->expectsOnce()
-              ->willReturn(false);
+        $this->defunc->session_status()
+                     ->willReturn(PHP_SESSION_NONE);
+        $this->defunc->session_start()
+                     ->willReturn(false);
 
         $session = new Session();
         $session->start();
@@ -83,12 +73,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Session ID from other session');
 
-        $status = $this->yarn->ravel('session_status');
-        $status->expectsOnce()
-               ->willReturn(PHP_SESSION_NONE);
-        $start = $this->yarn->ravel('session_start');
-        $start->expectsOnce()
-              ->willReturn(true);
+        $this->defunc->session_status()
+                     ->willReturn(PHP_SESSION_NONE);
+        $this->defunc->session_start()
+                     ->willReturn(true);
 
         $storage = $this->prophesize(SessionStorage::class);
         $storage->has('started_at')->willReturn(true);
@@ -104,12 +92,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testResumeHappyPath()
     {
-        $name = $this->yarn->ravel('session_name');
-        $name->expectsOnce()
-             ->willReturn('sid');
-        $start = $this->yarn->ravel('session_start');
-        $start->expectsOnce()
-              ->willReturn(true);
+        $this->defunc->session_name()
+                     ->willReturn('sid');
+        $this->defunc->session_start()
+                     ->willReturn(true);
 
         $request = $this->prophesize(IServerRequest::class);
         $request->getCookieParams()
@@ -146,9 +132,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testNoCookieForResume()
     {
-        $name = $this->yarn->ravel('session_name');
-        $name->expectsOnce()
-             ->willReturn('sid');
+        $this->defunc->session_name()
+                     ->willReturn('sid');
 
         $request = $this->prophesize(IServerRequest::class);
         $request->getCookieParams()
@@ -169,12 +154,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Can not resume session');
 
-        $name = $this->yarn->ravel('session_name');
-        $name->expectsOnce()
-             ->willReturn('sid');
-        $start = $this->yarn->ravel('session_start');
-        $start->expectsOnce()
-              ->willReturn(false);
+        $this->defunc->session_name()
+                     ->willReturn('sid');
+        $this->defunc->session_start()
+                     ->willReturn(false);
 
         $request = $this->prophesize(IServerRequest::class);
         $request->getCookieParams()
@@ -192,12 +175,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testStopSessionWithoutStartedAt()
     {
-        $name = $this->yarn->ravel('session_name');
-        $name->expectsOnce()
-             ->willReturn('sid');
-        $start = $this->yarn->ravel('session_start');
-        $start->expectsOnce()
-              ->willReturn(true);
+        $this->defunc->session_name()
+                     ->willReturn('sid');
+        $this->defunc->session_start()
+                     ->willReturn(true);
 
         $request = $this->prophesize(IServerRequest::class);
         $request->getCookieParams()
@@ -224,9 +205,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testSuspend()
     {
-        $write_close = $this->yarn->ravel('session_write_close');
-        $write_close->expectsOnce()
-                    ->willReturn(true);
+        $this->defunc->session_write_close()
+                     ->willReturn(true);
 
         $session = $this->getMockBuilder(Session::class)
                         ->setMethods(['isActive'])
@@ -250,36 +230,30 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testStopHappyPath()
     {
-        $this->yarn
-            ->ravel('session_get_cookie_params')
-            ->expectsOnce()
-            ->willReturn([
-                'path' => '/test',
-                'domain' => 'foobar.net',
-                'secure' => true,
-                'httponly' => true
-            ]);
+        $this->defunc
+             ->session_get_cookie_params()
+             ->willReturn([
+                 'path' => '/test',
+                 'domain' => 'foobar.net',
+                 'secure' => true,
+                 'httponly' => true
+             ]);
 
-        $this->yarn
-            ->ravel('session_name')
-            ->expectsOnce()
-            ->willReturn('sid');
+        $this->defunc
+             ->session_name()
+             ->willReturn('sid');
 
-        $this->yarn
-            ->ravel('time')
-            ->expectsOnce()
-            ->willReturn(0);
+        $this->defunc
+             ->time()
+             ->willReturn(0);
 
-        $this->yarn
-            ->ravel('setcookie')
-            ->with('sid', '', -42000, '/test', 'foobar.net', true, true)
-            ->expectsOnce()
-            ->willReturn(true);
+        $this->defunc
+             ->setcookie('sid', '', -42000, '/test', 'foobar.net', true, true)
+             ->willReturn(true);
 
-        $this->yarn
-            ->ravel('session_destroy')
-            ->expectsOnce()
-            ->willReturn(true);
+        $this->defunc
+             ->session_destroy()
+             ->willReturn(true);
 
         $session = $this->getMockBuilder(Session::class)
                         ->setMethods(['isActive'])
@@ -309,36 +283,30 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Can not destroy session');
 
-        $this->yarn
-            ->ravel('session_get_cookie_params')
-            ->expectsOnce()
-            ->willReturn([
-                'path' => '/test',
-                'domain' => 'foobar.net',
-                'secure' => true,
-                'httponly' => true
-            ]);
+        $this->defunc
+             ->session_get_cookie_params()
+             ->willReturn([
+                 'path' => '/test',
+                 'domain' => 'foobar.net',
+                 'secure' => true,
+                 'httponly' => true
+             ]);
 
-        $this->yarn
-            ->ravel('session_name')
-            ->expectsOnce()
-            ->willReturn('sid');
+        $this->defunc
+             ->session_name()
+             ->willReturn('sid');
 
-        $this->yarn
-            ->ravel('time')
-            ->expectsOnce()
-            ->willReturn(0);
+        $this->defunc
+             ->time()
+             ->willReturn(0);
 
-        $this->yarn
-            ->ravel('setcookie')
-            ->with('sid', '', -42000, '/test', 'foobar.net', true, true)
-            ->expectsOnce()
-            ->willReturn(true);
+        $this->defunc
+             ->setcookie('sid', '', -42000, '/test', 'foobar.net', true, true)
+             ->willReturn(true);
 
-        $this->yarn
-            ->ravel('session_destroy')
-            ->expectsOnce()
-            ->willReturn(false);
+        $this->defunc
+             ->session_destroy()
+             ->willReturn(false);
 
         $session = $this->getMockBuilder(Session::class)
                         ->setMethods(['isActive'])
