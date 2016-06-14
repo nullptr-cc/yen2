@@ -2,38 +2,61 @@
 
 namespace YenTest\Handler;
 
-use Yen\ClassResolver\FormatClassResolver;
+use Yen\Handler\Contract\IHandlerFactory;
 use Yen\Handler\HandlerRegistry;
-use Yen\Handler\HandlerNotFoundException;
+use Yen\Handler\Exception\HandlerNotFound;
+use Yen\Handler\Exception\HandlerNotMaked;
+use YenMock\Handler\CustomHandler;
 
 class HandlerRegistryTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetHandler()
     {
-        $resolver = new FormatClassResolver('\\YenMock\\Handler\\%sHandler');
-        $registry = new HandlerRegistry($resolver);
+        $factory = $this->prophesize(IHandlerFactory::class);
+        $factory->makeHandler('custom')
+                ->willReturn(new CustomHandler());
 
+        $registry = new HandlerRegistry($factory->reveal());
         $handler = $registry->getHandler('custom');
 
-        $this->assertInstanceOf(\YenMock\Handler\CustomHandler::class, $handler);
+        $this->assertInstanceOf(CustomHandler::class, $handler);
     }
 
     public function testGetHandlerException()
     {
-        $this->expectException(HandlerNotFoundException::class);
+        $this->expectException(HandlerNotFound::class);
 
-        $resolver = new FormatClassResolver('\\YenMock\\Handler\\%sHandler');
-        $registry = new HandlerRegistry($resolver);
+        $factory = $this->prophesize(IHandlerFactory::class);
+        $factory->makeHandler('custom')
+                ->willThrow(new HandlerNotMaked());
 
-        $handler = $registry->getHandler('fake');
+        $registry = new HandlerRegistry($factory->reveal());
+        $handler = $registry->getHandler('custom');
     }
 
     public function testHasHandler()
     {
-        $resolver = new FormatClassResolver('\\YenMock\\Handler\\%sHandler');
-        $registry = new HandlerRegistry($resolver);
+        $factory = $this->prophesize(IHandlerFactory::class);
+        $factory->makeHandler('custom')
+                ->willReturn(new CustomHandler());
+        $factory->makeHandler('fake')
+                ->willThrow(new HandlerNotMaked());
+
+        $registry = new HandlerRegistry($factory->reveal());
 
         $this->assertTrue($registry->hasHandler('custom'));
         $this->assertFalse($registry->hasHandler('fake'));
+    }
+
+    public function testDoubleCall()
+    {
+        $factory = $this->prophesize(IHandlerFactory::class);
+        $factory->makeHandler('custom')
+                ->willReturn(new CustomHandler());
+
+        $registry = new HandlerRegistry($factory->reveal());
+
+        $this->assertTrue($registry->hasHandler('custom'));
+        $this->assertInstanceOf(CustomHandler::class, $registry->getHandler('custom'));
     }
 }

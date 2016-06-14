@@ -2,32 +2,63 @@
 
 namespace Yen\Handler;
 
-use Yen\Util\CommonRegistry;
+use Yen\Handler\Contract\IHandlerFactory;
 use Yen\Handler\Contract\IHandlerRegistry;
+use Yen\Handler\Exception\HandlerNotFound;
+use Yen\Handler\Exception\HandlerNotMaked;
 
-class HandlerRegistry extends CommonRegistry implements IHandlerRegistry
+class HandlerRegistry implements IHandlerRegistry
 {
-    /**
-     * @return Yen\Handler\Contract\IHandler
-     */
-    public function getHandler($name)
+    private $factory;
+    private $handlers;
+
+    public function __construct(IHandlerFactory $factory)
     {
-        return $this->get($name);
+        $this->factory = $factory;
+        $this->handlers = [];
     }
 
     /**
+     * @param string $name - short or conventional name of handler
+     * @return Yen\Handler\Contract\IHandler
+     * @throws Yen\Handler\Exception\HandlerNotFound
+     */
+    public function getHandler($name)
+    {
+        return $this->getOrMakeHandler($name);
+    }
+
+    /**
+     * @param string $name - short or conventional name of handler
      * @return bool
      */
     public function hasHandler($name)
     {
-        return $this->has($name);
+        try {
+            $handler = $this->getOrMakeHandler($name);
+            return true;
+        } catch (HandlerNotFound $ex) {
+            return false;
+        };
     }
 
     /**
-     * @return Throwable
+     * @param string $name - short or conventional name of handler
+     * @return Yen\Handler\Contract\IHandler
+     * @throws Yen\Handler\Exception\HandlerNotFound
      */
-    protected function createInvalidNameException($name)
+    private function getOrMakeHandler($name)
     {
-        return new HandlerNotFoundException($name);
+        if (array_key_exists($name, $this->handlers)) {
+            return $this->handlers[$name];
+        };
+
+        try {
+            $handler = $this->factory->makeHandler($name);
+            $this->handlers[$name] = $handler;
+            return $handler;
+        } catch (HandlerNotMaked $ex) {
+            throw new HandlerNotFound($name, 0, $ex);
+        };
     }
 }
