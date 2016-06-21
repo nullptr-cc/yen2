@@ -3,7 +3,7 @@
 namespace Yen\Util;
 
 use Yen\ClassResolver\Contract\IClassResolver;
-use Yen\ClassResolver\ClassNotResolved;
+use Yen\ClassResolver\Exception\ClassNotResolved;
 
 class CommonRegistry
 {

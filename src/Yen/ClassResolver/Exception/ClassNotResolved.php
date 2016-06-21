@@ -1,6 +1,6 @@
 <?php
 
-namespace Yen\ClassResolver;
+namespace Yen\ClassResolver\Exception;
 
 class ClassNotResolved extends \Exception
 {

@@ -3,7 +3,7 @@
 namespace YenTest\Util;
 
 use Yen\ClassResolver\Contract\IClassResolver;
-use Yen\ClassResolver\ClassNotResolved;
+use Yen\ClassResolver\Exception\ClassNotResolved;
 use YenMock\Util\DummyRegistry;
 
 class CommonRegistryTest extends \PHPUnit_Framework_TestCase

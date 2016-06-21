@@ -3,7 +3,7 @@
 namespace YenTest\Util;
 
 use Yen\ClassResolver\FormatClassResolver;
-use Yen\ClassResolver\ClassNotResolved;
+use Yen\ClassResolver\Exception\ClassNotResolved;
 
 class FormatClassResolverTest extends \PHPUnit_Framework_TestCase
 {

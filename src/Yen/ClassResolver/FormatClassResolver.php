@@ -3,6 +3,7 @@
 namespace Yen\ClassResolver;
 
 use Yen\ClassResolver\Contract\IClassResolver;
+use Yen\ClassResolver\Exception\ClassNotResolved;
 
 class FormatClassResolver implements IClassResolver
 {

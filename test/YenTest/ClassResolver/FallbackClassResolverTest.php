@@ -4,7 +4,7 @@ namespace YenTest\ClassResolver;
 
 use Yen\ClassResolver\Contract\IClassResolver;
 use Yen\ClassResolver\FallbackClassResolver;
-use Yen\ClassResolver\ClassNotResolved;
+use Yen\ClassResolver\Exception\ClassNotResolved;
 
 class FallbackClassResolverTest extends \PHPUnit_Framework_TestCase
 {

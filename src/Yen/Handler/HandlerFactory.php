@@ -3,7 +3,7 @@
 namespace Yen\Handler;
 
 use Yen\ClassResolver\Contract\IClassResolver;
-use Yen\ClassResolver\ClassNotResolved;
+use Yen\ClassResolver\Exception\ClassNotResolved;
 use Yen\Handler\Contract\IHandlerFactory;
 use Yen\Handler\Exception\HandlerNotMaked;
 
