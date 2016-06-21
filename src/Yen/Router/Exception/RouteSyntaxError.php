@@ -2,7 +2,7 @@
 
 namespace Yen\Router\Exception;
 
-class RuleSyntaxError extends \Exception
+class RouteSyntaxError extends \Exception
 {
     public function __construct($index, $line)
     {

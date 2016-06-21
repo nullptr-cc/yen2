@@ -25,11 +25,8 @@ class UrlBuilder
     {
         if ($uri->getScheme() == 'route') {
             $resolved = $this->router->resolve($uri->getPath(), $args);
-            if (null === $resolved) {
-                throw new \InvalidArgumentException('Unknown route "' . $uri->getPath() . '"');
-            };
-            $uri = Http\Uri::createFromString($resolved->uri);
-            $args = $resolved->args;
+            $uri = Http\Uri::createFromString($resolved->path());
+            $args = $resolved->arguments();
         };
 
         if (!$uri->getScheme()) {

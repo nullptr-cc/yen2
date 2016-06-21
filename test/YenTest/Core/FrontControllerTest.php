@@ -4,7 +4,7 @@ namespace YenTest\Core;
 
 use Yen\Core\FrontController;
 use Yen\Router\Contract\IRouter;
-use Yen\Router\Route;
+use Yen\Router\RoutePoint;
 use Yen\Handler\Contract\IHandlerRegistry;
 use Yen\Http\Contract\IResponse;
 use Yen\Http\Contract\IRequest;
@@ -57,8 +57,10 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase
 
     protected function prepare()
     {
-        $request = ServerRequest::createFromGlobals(['REQUEST_URI' => '/test', 'REQUEST_METHOD' => IRequest::METHOD_GET]);
-        $route = new Route('custom', []);
+        $request = ServerRequest::createFromGlobals(
+            ['REQUEST_URI' => '/test', 'REQUEST_METHOD' => IRequest::METHOD_GET]
+        );
+        $route = new RoutePoint('custom', []);
         $handler = new CustomHandler();
 
         $router = $this->prophesize(IRouter::class);

@@ -3,62 +3,54 @@
 namespace Yen\Router;
 
 use Yen\Router\Contract\IRouter;
-use Yen\Router\Exception\RuleSyntaxError;
+use Yen\Router\Exception\RouteSyntaxError;
 use Yen\Router\Exception\RouteNotFound;
 
 class Router implements IRouter
 {
-    private $rules;
+    private $routes;
 
     public function __construct()
     {
-        $this->rules = [];
-    }
-
-    public function addRule($name, Rule $rule)
-    {
-        if (array_key_exists($name, $this->rules)) {
-            throw new \LogicException('Rule with name "' . $name . '" already added');
-        };
-
-        $this->rules[$name] = $rule;
-
-        return $this;
+        $this->routes = [];
     }
 
     /**
-     * @return Yen\Router\Contract\IRoute
+     * @return Yen\Router\Contract\IRoutePoint
      */
     public function route($uri)
     {
-        foreach ($this->rules as $rule) {
-            $r = $rule->match($uri);
-            if ($r->entry !== null) {
-                return new Route($r->entry, $r->args);
+        foreach ($this->routes as $route) {
+            $result = $route->match($uri);
+            if ($result->matched()) {
+                return $result->point();
             };
         };
 
         throw new RouteNotFound($uri);
     }
 
-    public function resolve($name, $args)
+    /**
+     * @return Yen\Router\Contract\IRoutePoint
+     */
+    public function resolve($name, array $args)
     {
-        if (isset($this->rules[$name])) {
-            return $this->rules[$name]->apply($args);
+        if (!isset($this->routes[$name])) {
+            throw new \LogicException('Unknown route: ' . $name);
         };
 
-        throw new \LogicException('Unknown rule "' . $name . '"');
+        return $this->routes[$name]->apply($args);
     }
 
     public static function createDefault()
     {
         $router = new self();
-        $router->addRule('default', new Rule('/*', '$uri'));
+        $router->add('default', new Route('/*', '$uri'));
 
         return $router;
     }
 
-    public static function createFromRulesFile($file_path)
+    public static function createFromRoutesFile($file_path)
     {
         if (!is_readable($file_path)) {
             throw new \RuntimeException('Cannot open stream: ' . $file_path);
@@ -69,17 +61,28 @@ class Router implements IRouter
 
         foreach ($lines as $index => $line) {
             $rule_info = self::processRuleLine($index, $line);
-            $router->addRule($rule_info['name'], new Rule($rule_info['location'], $rule_info['result']));
+            $router->add($rule_info['name'], new Route($rule_info['location'], $rule_info['result']));
         };
 
         return $router;
+    }
+
+    private function add($name, Route $route)
+    {
+        if (array_key_exists($name, $this->routes)) {
+            throw new \LogicException('Route with name "' . $name . '" already added');
+        };
+
+        $this->routes[$name] = $route;
+
+        return $this;
     }
 
     private static function processRuleLine($index, $line)
     {
         $lr = array_filter(array_map('trim', explode('=>', $line)));
         if (count($lr) != 2) {
-            throw new RuleSyntaxError($index, $line);
+            throw new RouteSyntaxError($index, $line);
         };
 
         list($location, $result) = $lr;

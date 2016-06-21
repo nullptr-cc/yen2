@@ -3,6 +3,8 @@
 namespace YenTest\Util;
 
 use Yen\Util\UrlBuilder;
+use Yen\Router\RoutePoint;
+use Yen\Router\Router;
 
 class UrlBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,10 +30,10 @@ class UrlBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildNamedRoute()
     {
         $router = $this->mockRouter();
-
+        $route_point = new RoutePoint('/test/baz', []);
         $router->method('resolve')
                ->with($this->equalTo('foo'), $this->equalTo(['bar' => 'baz']))
-               ->willReturn((object)['uri' => '/test/baz', 'args' => []]);
+               ->willReturn($route_point);
 
         $url_builder = new UrlBuilder($router, new \Yen\Http\Uri());
         $uri = \Yen\Http\Uri::createFromString('route:foo');
@@ -63,16 +65,12 @@ class UrlBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://test.net/search?q=search+query', $url->__toString());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Unknown route "unknown"
-     */
     public function testUnknownRoute()
     {
-        $router = $this->mockRouter();
-        $router->method('resolve')
-               ->willReturn(null);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unknown route: unknown');
 
+        $router = Router::createDefault();
         $url_builder = new UrlBuilder($router);
         $uri = \Yen\Http\Uri::createFromString('route:unknown');
 

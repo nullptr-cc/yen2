@@ -24,19 +24,19 @@ class FrontController
 
     public function processRequest(IServerRequest $request)
     {
-        $route = $this->router->route($request->getUri()->getPath());
+        $route_point = $this->router->route($request->getUri()->getPath());
 
-        if (!$this->handlers->hasHandler($route->entry())) {
+        if (!$this->handlers->hasHandler($route_point->path())) {
             return $this->response(IResponse::STATUS_NOT_FOUND);
         };
 
-        $handler = $this->handlers->getHandler($route->entry());
+        $handler = $this->handlers->getHandler($route_point->path());
 
         if (!in_array($request->getMethod(), $handler->getAllowedMethods())) {
             return $this->response(IResponse::STATUS_METHOD_NOT_ALLOWED);
         };
 
-        $response = $handler->handle($request->withJoinedQueryParams($route->arguments()));
+        $response = $handler->handle($request->withJoinedQueryParams($route_point->arguments()));
 
         return $response;
     }
