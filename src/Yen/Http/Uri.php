@@ -2,16 +2,17 @@
 
 namespace Yen\Http;
 
-class Uri implements Contract\IUri, \JsonSerializable
+use Yen\Http\Contract\IUri;
+
+class Uri implements IUri, \JsonSerializable
 {
-    protected $scheme;
-    protected $userinfo;
-    protected $host;
-    protected $port;
-    protected $path;
-    protected $query;
-    protected $fragment;
-    protected $authority;
+    private $scheme;
+    private $userinfo;
+    private $host;
+    private $port;
+    private $path;
+    private $query;
+    private $fragment;
 
     public function __construct(array $parts = [])
     {
@@ -22,10 +23,6 @@ class Uri implements Contract\IUri, \JsonSerializable
         $this->path = isset($parts['path']) ? $parts['path'] : '/';
         isset($parts['query']) && $this->query = $parts['query'];
         isset($parts['fragment']) && $this->fragment = $parts['fragment'];
-
-        $this->authority = $this->host;
-        $this->userinfo && $this->authority = $this->userinfo . '@' . $this->authority;
-        $this->port && $this->authority .= ':' . $this->port;
     }
 
     public static function createFromString($string)
@@ -40,7 +37,17 @@ class Uri implements Contract\IUri, \JsonSerializable
 
     public function getAuthority()
     {
-        return $this->authority;
+        $authority = $this->host;
+
+        if ($this->userinfo) {
+            $authority = $this->userinfo . '@' . $authority;
+        };
+
+        if ($this->port) {
+            $authority .= ':' . $this->port;
+        };
+
+        return $authority;
     }
 
     public function getUserInfo()
@@ -75,32 +82,44 @@ class Uri implements Contract\IUri, \JsonSerializable
 
     public function withScheme($scheme)
     {
-        return new self(array_merge($this->parts(), ['scheme' => $scheme]));
+        $clone = clone $this;
+        $clone->scheme = $scheme;
+        return $clone;
     }
 
     public function withUserInfo($user, $password = null)
     {
-        return new self(array_merge($this->parts(), ['user' => $user, 'pass' => $password]));
+        $clone = clone $this;
+        $clone->userinfo = $user . ($password ? ':' . $password : '');
+        return $clone;
     }
 
     public function withHost($host)
     {
-        return new self(array_merge($this->parts(), ['host' => $host]));
+        $clone = clone $this;
+        $clone->host = $host;
+        return $clone;
     }
 
     public function withPort($port)
     {
-        return new self(array_merge($this->parts(), ['port' => $port]));
+        $clone = clone $this;
+        $clone->port = $port;
+        return $clone;
     }
 
     public function withPath($path)
     {
-        return new self(array_merge($this->parts(), ['path' => $path]));
+        $clone = clone $this;
+        $clone->path = $path;
+        return $clone;
     }
 
     public function withQuery($query)
     {
-        return new self(array_merge($this->parts(), ['query' => $query]));
+        $clone = clone $this;
+        $clone->query = $query;
+        return $clone;
     }
 
     public function withJoinedQuery(array $args)
@@ -114,14 +133,17 @@ class Uri implements Contract\IUri, \JsonSerializable
 
     public function withFragment($fragment)
     {
-        return new self(array_merge($this->parts(), ['fragment' => $fragment]));
+        $clone = clone $this;
+        $clone->fragment = $fragment;
+        return $clone;
     }
 
     public function __toString()
     {
         $str = [];
         $this->scheme && $str[] = $this->scheme . '://';
-        $this->authority && $str[] = $this->authority;
+        $authority = $this->getAuthority();
+        $authority && $str[] = $authority;
         $str[] = $this->path;
         $this->query && $str[] = '?' . $this->query;
         $this->fragment && $str[] = '#' . $this->fragment;
@@ -132,18 +154,5 @@ class Uri implements Contract\IUri, \JsonSerializable
     public function jsonSerialize()
     {
         return $this->__toString();
-    }
-
-    private function parts()
-    {
-        return [
-            'scheme' => $this->scheme,
-            'userinfo' => $this->userinfo,
-            'host' => $this->host,
-            'port' => $this->port,
-            'path' => $this->path,
-            'query' => $this->query,
-            'fragment' => $this->fragment
-        ];
     }
 }

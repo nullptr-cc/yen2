@@ -18,6 +18,7 @@ interface IUri
     public function withPort($port);
     public function withPath($path);
     public function withQuery($query);
+    public function withJoinedQuery(array $args);
     public function withFragment($fragment);
     public function __toString();
 }
