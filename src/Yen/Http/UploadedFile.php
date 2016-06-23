@@ -2,7 +2,9 @@
 
 namespace Yen\Http;
 
-class UploadedFile
+use Yen\Http\Contract\IUploadedFile;
+
+class UploadedFile implements IUploadedFile
 {
     protected $error;
     protected $size;
