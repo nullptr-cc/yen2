@@ -39,4 +39,44 @@ class Response extends Message implements IResponse
         $clone->reason = $reason;
         return $clone;
     }
+
+    public static function ok()
+    {
+        return new self(IResponse::STATUS_OK);
+    }
+
+    public static function movedPermanently()
+    {
+        return new self(IResponse::STATUS_MOVED_PERMANENTLY);
+    }
+
+    public static function movedTemporary()
+    {
+        return new self(IResponse::STATUS_MOVED_TEMPORARY);
+    }
+
+    public static function badRequest()
+    {
+        return new self(IResponse::STATUS_BAD_REQUEST);
+    }
+
+    public static function forbidden()
+    {
+        return new self(IResponse::STATUS_FORBIDDEN);
+    }
+
+    public static function notFound()
+    {
+        return new self(IResponse::STATUS_NOT_FOUND);
+    }
+
+    public static function methodNotAllowed()
+    {
+        return new self(IResponse::STATUS_METHOD_NOT_ALLOWED);
+    }
+
+    public static function internalError()
+    {
+        return new self(IResponse::STATUS_INTERNAL_ERROR);
+    }
 }
