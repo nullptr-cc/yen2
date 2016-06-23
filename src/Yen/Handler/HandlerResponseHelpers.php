@@ -54,17 +54,6 @@ trait HandlerResponseHelpers
         );
     }
 
-    protected function redirect(IUri $url, $permanent = false)
-    {
-        if ($permanent) {
-            $code = IResponse::STATUS_MOVED_PERMANENTLY;
-        } else {
-            $code = IResponse::STATUS_MOVED_TEMPORARY;
-        };
-
-        return $this->response($code, ['Location' => $url]);
-    }
-
     protected function response($code, $headers = [], $content = '')
     {
         return new Response($code, $headers, $content);

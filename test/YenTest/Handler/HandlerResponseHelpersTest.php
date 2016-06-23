@@ -72,30 +72,4 @@ class HandlerResponseHelpersTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['Content-Type' => 'text/plain'], $response->getHeaders());
         $this->assertEquals('test', $response->getBody());
     }
-
-    public function testRedirectPermanent()
-    {
-        $handler = new HelpersHandler();
-        $request = ServerRequest::createFromGlobals()->withQueryParams(['r' => 'redirect_perm']);
-
-        $response = $handler->handle($request);
-
-        $this->assertInstanceOf(IResponse::class, $response);
-        $this->assertEquals(IResponse::STATUS_MOVED_PERMANENTLY, $response->getStatusCode());
-        $this->assertEquals(['Location' => '/test'], $response->getHeaders());
-        $this->assertEquals('', $response->getBody());
-    }
-
-    public function testRedirectTemporary()
-    {
-        $handler = new HelpersHandler();
-        $request = ServerRequest::createFromGlobals()->withQueryParams(['r' => 'redirect_temp']);
-
-        $response = $handler->handle($request);
-
-        $this->assertInstanceOf(IResponse::class, $response);
-        $this->assertEquals(IResponse::STATUS_MOVED_TEMPORARY, $response->getStatusCode());
-        $this->assertEquals(['Location' => '/test'], $response->getHeaders());
-        $this->assertEquals('', $response->getBody());
-    }
 }
