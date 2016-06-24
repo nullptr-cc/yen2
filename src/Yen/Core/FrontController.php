@@ -2,17 +2,16 @@
 
 namespace Yen\Core;
 
-use Yen\Http\Contract\IServerRequest;
-use Yen\Http\Contract\IResponse;
-use Yen\Http\Response;
 use Yen\Router\Contract\IRouter;
+use Yen\Router\Exception\RouteNotFound;
 use Yen\Handler\Contract\IHandlerRegistry;
-use Yen\Handler\HandlerNotFoundException;
+use Yen\Handler\Exception\HandlerNotFound;
+use Yen\Http\Contract\IServerRequest;
 
 class FrontController
 {
-    protected $router;
-    protected $handlers;
+    private $router;
+    private $handlers;
 
     public function __construct(
         IRouter $router,
@@ -24,25 +23,29 @@ class FrontController
 
     public function processRequest(IServerRequest $request)
     {
+        try {
+            return $this->routeAndHandleRequest($request);
+        } catch (RouteNotFound $ex) {
+            return $this->handleNotFound($request);
+        } catch (HandlerNotFound $ex) {
+            return $this->handleNotFound($request);
+        };
+    }
+
+    private function routeAndHandleRequest(IServerRequest $request)
+    {
         $route_point = $this->router->route($request->getUri()->getPath());
-
-        if (!$this->handlers->hasHandler($route_point->path())) {
-            return $this->response(IResponse::STATUS_NOT_FOUND);
-        };
-
         $handler = $this->handlers->getHandler($route_point->path());
-
-        if (!in_array($request->getMethod(), $handler->getAllowedMethods())) {
-            return $this->response(IResponse::STATUS_METHOD_NOT_ALLOWED);
-        };
-
         $response = $handler->handle($request->withJoinedQueryParams($route_point->arguments()));
 
         return $response;
     }
 
-    protected function response($code)
+    private function handleNotFound(IServerRequest $request)
     {
-        return new Response($code, [], '');
+        $handler = $this->handlers->getNotFoundHandler();
+        $response = $handler->handle($request);
+
+        return $response;
     }
 }

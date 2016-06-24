@@ -16,4 +16,9 @@ interface IHandlerRegistry
      * @return bool
      */
     public function hasHandler($name);
+
+    /**
+     * @return Yen\Handler\Contract\IHandler
+     */
+    public function getNotFoundHandler();
 }

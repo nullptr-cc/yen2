@@ -2,6 +2,7 @@
 
 namespace Yen\Handler;
 
+use Yen\Handler\Contract\IHandler;
 use Yen\Handler\Contract\IHandlerFactory;
 use Yen\Handler\Contract\IHandlerRegistry;
 use Yen\Handler\Exception\HandlerNotFound;
@@ -11,6 +12,7 @@ class HandlerRegistry implements IHandlerRegistry
 {
     private $factory;
     private $handlers;
+    private $not_found_handler;
 
     public function __construct(IHandlerFactory $factory)
     {
@@ -40,6 +42,22 @@ class HandlerRegistry implements IHandlerRegistry
         } catch (HandlerNotFound $ex) {
             return false;
         };
+    }
+
+    public function setNotFoundHandler(IHandler $not_found_handler)
+    {
+        $this->not_found_handler = $not_found_handler;
+
+        return $this;
+    }
+
+    public function getNotFoundHandler()
+    {
+        if (!$this->not_found_handler) {
+            throw new \LogicException('Not found handler have not been defined');
+        };
+
+        return $this->not_found_handler;
     }
 
     /**

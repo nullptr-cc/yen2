@@ -20,13 +20,18 @@ class HandlerFactory implements IHandlerFactory
     {
         try {
             $classname = $this->resolver->resolve($name);
-            return $this->makeResolved($classname);
+            return $this->make($classname);
         } catch (ClassNotResolved $ex) {
             throw new HandlerNotMaked($name, 0, $ex);
         }
     }
 
-    protected function makeResolved($classname)
+    public function makeResolved($classname)
+    {
+        return $this->make($classname);
+    }
+
+    protected function make($classname)
     {
         return new $classname();
     }

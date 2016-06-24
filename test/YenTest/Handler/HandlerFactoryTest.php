@@ -22,6 +22,16 @@ class HandlerFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(CustomHandler::class, $handler);
     }
 
+    public function testMakeResolved()
+    {
+        $resolver = $this->prophesize(IClassResolver::class);
+
+        $factory = new HandlerFactory($resolver->reveal());
+        $handler = $factory->makeResolved(CustomHandler::class);
+
+        $this->assertInstanceOf(CustomHandler::class, $handler);
+    }
+
     public function testMakeHandlerException()
     {
         $this->expectException(HandlerNotMaked::class);
