@@ -40,4 +40,24 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $list_request = $help_request->withUri($list_uri);
         $this->assertEquals($list_uri->__toString(), $list_request->getUri()->__toString());
     }
+
+    public function testCtorGet()
+    {
+        $uri = Uri::createFromString('https://api.example.com/v1/help?command=list');
+
+        $request = Request::get($uri);
+
+        $this->assertEquals(IRequest::METHOD_GET, $request->getMethod());
+        $this->assertEquals($uri->__toString(), $request->getUri()->__toString());
+    }
+
+    public function testCtorPost()
+    {
+        $uri = Uri::createFromString('https://api.example.com/v1/help');
+
+        $request = Request::post($uri);
+
+        $this->assertEquals(IRequest::METHOD_POST, $request->getMethod());
+        $this->assertEquals($uri->__toString(), $request->getUri()->__toString());
+    }
 }

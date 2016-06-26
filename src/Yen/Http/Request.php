@@ -8,9 +8,9 @@ use Yen\Http\Contract\IUri;
 
 class Request extends Message implements IRequest
 {
-    protected $uri;
-    protected $method;
-    protected $target;
+    private $uri;
+    private $method;
+    private $target;
 
     public function __construct(
         IUri $uri,
@@ -24,6 +24,16 @@ class Request extends Message implements IRequest
         $this->uri = $uri;
         $this->method = $method;
         $this->target = $target ?: $this->formTarget($uri);
+    }
+
+    public static function get(IUri $uri)
+    {
+        return new self($uri, IRequest::METHOD_GET);
+    }
+
+    public static function post(IUri $uri)
+    {
+        return new self($uri, IRequest::METHOD_POST);
     }
 
     public function getMethod()
@@ -62,7 +72,7 @@ class Request extends Message implements IRequest
         return $clone;
     }
 
-    protected function formTarget(IUri $uri)
+    private function formTarget(IUri $uri)
     {
         $target = $uri->getPath();
         if ($query = $uri->getQuery()) {
